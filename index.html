@@ -6,17 +6,132 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
 <body>
+<svg width="500" height="500" id="ageYelpPlot"></svg>
+<div id="ourLegend" max-width = "800"></div>
 <script>
+let svg = d3.select("svg#ageYelpPlot");
+let width = svg.attr("width");
+let height = svg.attr("height");
+let margin = { top: 10, right: 10, bottom: 50, left:50};
+let chartWidth = width - margin.left - margin.right;
+let chartHeight = height - margin.top - margin.bottom;
+
+
 const requestData = async () => {
-  const populationData = await d3.csv("pop_mod.csv");
+  const ageData = await d3.csv("pop_mod.csv");
   const yelpData = await d3.json("zip_code_averages.json");
 
-  populationData.forEach(function (d) {
-    console.log(d.pop);
-    console.log(d.zip);
-    console.log(yelpData[d.zip]);
+  const ageMin = d3.min(ageData, d => d.age);
+  const ageMax = d3.max(ageData, d => d.age);
+  const ageScale = d3.scaleLinear()
+          .domain([ageMin, ageMax])
+          .range([0, chartWidth]);
+
+  const ratingScale = d3.scaleLinear()
+          .domain([0, 5])
+          .range([chartHeight, 0]);
+
+  let arrayOfRestaurantTypes = ["Italian", "Mexican", "Chinese"];
+  const colorScale = d3.scaleOrdinal()
+    .domain(arrayOfRestaurantTypes)
+    .range(["blue", "red", "green"]);
+
+
+   // Y axis
+   let leftAxis = d3.axisLeft(ratingScale);
+   svg.append("g").attr("class", "y axis")
+     .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
+     .call(leftAxis);
+
+   // X axis
+   let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format(".01s"));
+   let element = svg.append("g").attr("class", "x axis")
+     .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
+   bottomAxis(element);
+
+   // Y axis
+   let leftGridlines = d3.axisLeft(ratingScale).tickSize(-chartWidth-10).tickFormat("");
+   svg.append("g").attr("class", "y gridlines") // See CSS at top of file
+     .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
+     .call(leftGridlines);
+
+   // X axis
+   let bottomGridlines = d3.axisBottom(ageScale).tickSize(-chartHeight-10).tickFormat("");
+         // Why is tickSize negative?
+   element = svg.append("g").attr("class", "x gridlines")
+     .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
+   bottomGridlines(element);
+
+
+
+
+  let scatter = svg.append("g") // We make a subgroup to contain the points we are adding, and use the margins to shrink it and move it to the right place, so that it doesn't overlap our axes
+         .attr("transform","translate("+margin.left+","+margin.top+")");
+
+  ageData.forEach(function (d) {
+    // console.log(d.age);
+    // console.log(d.zip);
+    let age = ageScale(d.age);
+    if (yelpData[d.zip] != null) {
+      console.log(yelpData[d.zip].Italian);
+      if (yelpData[d.zip].Italian != null) {
+        let rating = ratingScale((yelpData[d.zip].Italian.star_total)/(yelpData[d.zip].Italian.count));
+
+        let circle = scatter.append("circle")
+                .attr("cx", age)
+                .attr("cy", rating)
+                .attr("r", 4)
+                .attr("opacity", 0.8)
+                .style("fill", "blue")
+                .attr("zip", d.zip)
+                .attr("restaurantType", "Italian")
+      }
+      if (yelpData[d.zip].Mexican != null) {
+        let ratingMexican = ratingScale((yelpData[d.zip].Mexican.star_total)/(yelpData[d.zip].Mexican.count));
+
+        let circle = scatter.append("circle")
+                .attr("cx", age)
+                .attr("cy", ratingMexican)
+                .attr("r", 4)
+                .attr("opacity", 0.8)
+                .style("fill", "red")
+                .attr("zip", d.zip)
+                .attr("restaurantType", "Mexican")
+      }
+      if (yelpData[d.zip].Chinese != null) {
+        let ratingChinese = ratingScale((yelpData[d.zip].Chinese.star_total)/(yelpData[d.zip].Chinese.count));
+
+        let circle = scatter.append("circle")
+                .attr("cx", age)
+                .attr("cy", ratingChinese)
+                .attr("r", 4)
+                .attr("opacity", 0.8)
+                .style("fill", "green")
+                .attr("zip", d.zip)
+                .attr("restaurantType", "Chinese")
+      }
+
+    }
+
+
   });
-  console.log(yelpData["88901"]);
+
+  colorScale.domain().forEach(function(d,i) {
+      d3.select("#ourLegend")
+        .append("span").text(d)
+        .style("color", colorScale(d))
+        .on("mouseover", function() {
+          scatter.selectAll("circle").each(function() {
+            let circle = d3.select(this);
+            if (circle.attr("restaurantType") === d) {
+              circle.attr("opacity", 0.8);
+            }
+            else {
+              circle.attr("opacity", 0.1);
+            }
+          })
+        })
+      });
 
 }
 requestData();
