@@ -6,6 +6,22 @@
   <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
 <body>
+<script>
+const requestData = async () => {
+  const populationData = await d3.csv("pop_mod.csv");
+  const yelpData = await d3.json("zip_code_averages.json");
+
+  populationData.forEach(function (d) {
+    console.log(d.pop);
+    console.log(d.zip);
+    console.log(yelpData[d.zip]);
+  });
+  console.log(yelpData["88901"]);
+
+}
+requestData();
+
+</script>
 
 </body>
 </html>
