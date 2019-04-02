@@ -4,259 +4,332 @@
   <meta charset="UTF-8">
   <title>Project 2</title>
   <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+  #ageYelpPlot {
+    float: left;
+  }
+  #ourAverages {
+    float: none;
+    margin-top: 80px;
+  }
+  </style>
 </head>
 <body>
-<svg width="500" height="500" id="ageYelpPlot"></svg>
+<svg width="800" height="600" id="ageYelpPlot"></svg>
+<div id="ourAverages" max-width = "800"></div>
 <div id="ourLegend" max-width = "800"></div>
+<div id="divForSlider"></div>
 <script>
-let svg = d3.select("svg#ageYelpPlot");
-let width = svg.attr("width");
-let height = svg.attr("height");
-let margin = { top: 10, right: 10, bottom: 50, left:50};
-let chartWidth = width - margin.left - margin.right;
-let chartHeight = height - margin.top - margin.bottom;
+  let svg = d3.select("svg#ageYelpPlot");
+  let width = svg.attr("width");
+  let height = svg.attr("height");
+  let margin = { top: 10, right: 10, bottom: 50, left:50};
+  let chartWidth = width - margin.left - margin.right;
+  let chartHeight = height - margin.top - margin.bottom;
 
 
-const requestData = async () => {
-  const ageData = await d3.csv("pop_mod.csv");
-  const yelpData = await d3.json("zip_code_averages.json");
+  const requestData = async () => {
+    //Pulling in the two datasets
+    const ageData = await d3.csv("pop_mod.csv");
+    const yelpData = await d3.json("zip_code_averages.json");
 
-  const ageMin = d3.min(ageData, d => d.age);
-  const ageMax = d3.max(ageData, d => d.age);
-  const ageScale = d3.scaleLinear()
-          .domain([ageMin, ageMax])
-          .range([0, chartWidth]);
-
-  const ratingScale = d3.scaleLinear()
-          .domain([0, 5])
-          .range([chartHeight, 0]);
-
-  let arrayOfRestaurantTypes = ["Italian", "Mexican", "Chinese", "Japanese"];
-  const colorScale = d3.scaleOrdinal()
-    .domain(arrayOfRestaurantTypes)
-    .range(["blue", "red", "green", "orange"]);
+    //ageScale is used for x axis
+    const ageMin = d3.min(ageData, d => d.age);
+    const ageMax = d3.max(ageData, d => d.age);
+    const ageScale = d3.scaleLinear()
+            .domain([ageMin, ageMax])
+            .range([0, chartWidth]);
 
 
-   // Y axis
-   let leftAxis = d3.axisLeft(ratingScale);
-   svg.append("g").attr("class", "y axis")
-     .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
-     .call(leftAxis);
+    const ageInvScale = d3.scaleLinear()
+            .domain([0, chartWidth])
+            .range([ageMin, ageMax])
 
-   // X axis
-   let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format(".01s"));
-   let element = svg.append("g").attr("class", "x axis")
-     .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
-   bottomAxis(element);
+    //rating scale is used for y axis
+    const ratingScale = d3.scaleLinear()
+            .domain([0, 5])
+            .range([chartHeight, 0]);
 
-   // Y axis
-   let leftGridlines = d3.axisLeft(ratingScale).tickSize(-chartWidth-10).tickFormat("");
-   svg.append("g").attr("class", "y gridlines") // See CSS at top of file
-     .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
-     .call(leftGridlines);
+    const ratingInvScale = d3.scaleLinear()
+            .domain([chartHeight, 0])
+            .range([0,5])
 
-   // X axis
-   let bottomGridlines = d3.axisBottom(ageScale).tickSize(-chartHeight-10).tickFormat("");
-   element = svg.append("g").attr("class", "x gridlines")
-     .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
-   bottomGridlines(element);
+    //We are using four restaurant types for our data, and each data point will be a certain
+    //color based on the restaurant type
+    let arrayOfRestaurantTypes = ["Italian", "Mexican", "Chinese", "Japanese"];
+    const colorScale = d3.scaleOrdinal()
+      .domain(arrayOfRestaurantTypes)
+      .range(["blue", "red", "green", "orange"]);
 
-  let scatter = svg.append("g")
-         .attr("transform","translate("+margin.left+","+margin.top+")");
+     // Y axis ticks
+     let leftAxis = d3.axisLeft(ratingScale);
+     svg.append("g")
+       .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
+       .call(leftAxis);
 
-  ageData.forEach(function (d) {
-    let age = ageScale(d.age);
-    if (yelpData[d.zip] != null) {
-      if (yelpData[d.zip].Italian != null) {
-        let ratingItalian = ratingScale((yelpData[d.zip].Italian.star_total)/(yelpData[d.zip].Italian.count));
+     // X axis ticks
+     let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format(".01s"));
+     let element = svg.append("g")
+       .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
+     bottomAxis(element);
 
-        let circle = scatter.append("circle")
-                .attr("cx", age)
-                .attr("cy", ratingItalian)
-                .attr("r", 4)
-                .attr("opacity", 0.8)
-                .style("fill", "blue")
-                .attr("zip", d.zip)
-                .attr("id", "C" + d.zip + "Italian")
-                .attr("restaurantType", "Italian")
+     // Y axis gridlines
+     let leftGridlines = d3.axisLeft(ratingScale).tickSize(-chartWidth-10).tickFormat("");
+     svg.append("g")
+       .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
+       .call(leftGridlines);
 
-        d3.select("#C" + d.zip + "Italian")
-        .on("mouseover", function() {
-              scatter.append("text")
-                .attr("id", "A" + d.zip + "Italian")
-                .attr("x", age)
-                .attr("y", ratingItalian-15)
-                .text("Zip:" + d.zip)
-              scatter.selectAll("circle").each(function() {
-                let circleWithSameZip = d3.select(this);
-                if (circleWithSameZip.attr("zip") === d.zip) {
-                  circleWithSameZip.attr("opacity", 0.8);
-                }
-                else {
-                  circleWithSameZip.attr("opacity", 0.1);
-                }
+     // X axis gridlines
+     let bottomGridlines = d3.axisBottom(ageScale).tickSize(-chartHeight-10).tickFormat("");
+     element = svg.append("g").attr("class", "gridlines")
+       .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
+     bottomGridlines(element);
+
+    let scatter = svg.append("g")
+           .attr("transform","translate("+margin.left+","+margin.top+")");
+
+    ageData.forEach(function (d) {
+      let age = ageScale(d.age);
+      if (yelpData[d.zip] != null) {
+        if (yelpData[d.zip].Italian != null) {
+          let ratingItalian = ratingScale((yelpData[d.zip].Italian.star_total)/(yelpData[d.zip].Italian.count));
+
+          let circle = scatter.append("circle")
+                  .attr("cx", age)
+                  .attr("cy", ratingItalian)
+                  .attr("r", 4)
+                  .attr("opacity", 0.8)
+                  .style("fill", "blue")
+                  .attr("zip", d.zip)
+                  .attr("id", "C" + d.zip + "Italian")
+                  .attr("restaurantType", "Italian")
+
+          d3.select("#C" + d.zip + "Italian")
+          .on("mouseover", function() {
+                scatter.append("text")
+                  .attr("id", "A" + d.zip + "Italian")
+                  .attr("x", age-80)
+                  .attr("y", ratingItalian-15)
+                  .text("Zip:" + d.zip)
+                scatter.selectAll("circle").each(function() {
+                  let circleWithSameZip = d3.select(this);
+                  if (circleWithSameZip.attr("zip") === d.zip) {
+                    circleWithSameZip.attr("opacity", 0.8).attr("r", 8);
+                  }
+                  else {
+                    circleWithSameZip.attr("opacity", 0.1);
+                  }
+              })
+          });
+
+          d3.select("#C" + d.zip + "Italian")
+          .on("mouseout", function() {
+            d3.select("#A" + d.zip + "Italian").remove();
+            scatter.selectAll("circle").each(function() {
+              let circle = d3.select(this);
+              circle.attr("opacity", 0.8).attr("r", 4);
             })
-        });
+          });
 
-        d3.select("#C" + d.zip + "Italian")
-        .on("mouseout", function() {
-          d3.select("#A" + d.zip + "Italian").remove();
-          scatter.selectAll("circle").each(function() {
-            let circle = d3.select(this);
-            circle.attr("opacity", 0.8);
-          })
-        });
+        }
+        if (yelpData[d.zip].Mexican != null) {
+          let ratingMexican = ratingScale((yelpData[d.zip].Mexican.star_total)/(yelpData[d.zip].Mexican.count));
 
-      }
-      if (yelpData[d.zip].Mexican != null) {
-        let ratingMexican = ratingScale((yelpData[d.zip].Mexican.star_total)/(yelpData[d.zip].Mexican.count));
+          let circle2 = scatter.append("circle")
+                  .attr("cx", age)
+                  .attr("cy", ratingMexican)
+                  .attr("r", 4)
+                  .attr("opacity", 0.8)
+                  .style("fill", "red")
+                  .attr("zip", d.zip)
+                  .attr("id", "C" + d.zip + "Mexican")
+                  .attr("restaurantType", "Mexican")
 
-        let circle2 = scatter.append("circle")
-                .attr("cx", age)
-                .attr("cy", ratingMexican)
-                .attr("r", 4)
-                .attr("opacity", 0.8)
-                .style("fill", "red")
-                .attr("zip", d.zip)
-                .attr("id", "C" + d.zip + "Mexican")
-                .attr("restaurantType", "Mexican")
+          d3.select("#C" + d.zip + "Mexican")
+          .on("mouseover", function() {
+                scatter.append("text")
+                  .attr("id", "A" + d.zip + "Mexican")
+                  .attr("x", age-80)
+                  .attr("y", ratingMexican-15)
+                  .text("Zip:" + d.zip)
+                scatter.selectAll("circle").each(function() {
+                  let circleWithSameZip = d3.select(this);
+                  if (circleWithSameZip.attr("zip") === d.zip) {
+                    circleWithSameZip.attr("opacity", 0.8).attr("r", 8);
+                  }
+                  else {
+                    circleWithSameZip.attr("opacity", 0.1);
+                  }
+                })
+            });
 
-        d3.select("#C" + d.zip + "Mexican")
+            d3.select("#C" + d.zip + "Mexican")
+            .on("mouseout", function() {
+              d3.select("#A" + d.zip + "Mexican").remove();
+              scatter.selectAll("circle").each(function() {
+                let circle = d3.select(this);
+                circle.attr("opacity", 0.8).attr("r", 4);
+              })
+            });
+        }
+        if (yelpData[d.zip].Chinese != null) {
+          let ratingChinese = ratingScale((yelpData[d.zip].Chinese.star_total)/(yelpData[d.zip].Chinese.count));
+
+          let circle3 = scatter.append("circle")
+                  .attr("cx", age)
+                  .attr("cy", ratingChinese)
+                  .attr("r", 4)
+                  .attr("opacity", 0.8)
+                  .style("fill", "green")
+                  .attr("zip", d.zip)
+                  .attr("id", "C" + d.zip + "Chinese")
+                  .attr("restaurantType", "Chinese")
+
+        d3.select("#C" + d.zip + "Chinese")
         .on("mouseover", function() {
               scatter.append("text")
-                .attr("id", "A" + d.zip + "Mexican")
-                .attr("x", age)
-                .attr("y", ratingMexican-15)
+                .attr("id", "A" + d.zip + "Chinese")
+                .attr("x", age-80)
+                .attr("y", ratingChinese -15)
                 .text("Zip:" + d.zip)
               scatter.selectAll("circle").each(function() {
                 let circleWithSameZip = d3.select(this);
                 if (circleWithSameZip.attr("zip") === d.zip) {
-                  circleWithSameZip.attr("opacity", 0.8);
+                  circleWithSameZip.attr("opacity", 0.8).attr("r", 8);
                 }
                 else {
                   circleWithSameZip.attr("opacity", 0.1);
                 }
               })
           });
-
-          d3.select("#C" + d.zip + "Mexican")
+          d3.select("#C" + d.zip + "Chinese")
           .on("mouseout", function() {
-            d3.select("#A" + d.zip + "Mexican").remove();
+            d3.select("#A" + d.zip + "Chinese").remove();
+            scatter.selectAll("circle").each(function() {
+              let circle = d3.select(this);
+              circle.attr("opacity", 0.8).attr("r", 4);
+            })
+          });
+        }
+        if (yelpData[d.zip].Japanese != null) {
+          let ratingJapanese = ratingScale((yelpData[d.zip].Japanese.star_total)/(yelpData[d.zip].Japanese.count));
+
+          let circle4 = scatter.append("circle")
+                  .attr("cx", age)
+                  .attr("cy", ratingJapanese)
+                  .attr("r", 4)
+                  .attr("opacity", 0.8)
+                  .style("fill", "orange")
+                  .attr("zip", d.zip)
+                  .attr("id", "C" + d.zip + "Japanese")
+                  .attr("restaurantType", "Japanese")
+
+          d3.select("#C" + d.zip + "Japanese")
+          .on("mouseover", function() {
+                scatter.append("text")
+                  .attr("id", "A" + d.zip + "Japanese")
+                  .attr("x", age-80)
+                  .attr("y", ratingJapanese-15)
+                  .text("Zip:" + d.zip)
+                scatter.selectAll("circle").each(function() {
+                  let circleWithSameZip = d3.select(this);
+                  if (circleWithSameZip.attr("zip") === d.zip) {
+                    circleWithSameZip.attr("opacity", 0.8).attr("r", 8);
+                  }
+                  else {
+                    circleWithSameZip.attr("opacity", 0.1);
+                  }
+                })
+          });
+
+          d3.select("#C" + d.zip + "Japanese")
+          .on("mouseout", function() {
+            d3.select("#A" + d.zip + "Japanese").remove();
+            scatter.selectAll("circle").each(function() {
+              let circle = d3.select(this);
+              circle.attr("opacity", 0.8).attr("r", 4);
+            })
+          });
+        }
+
+      }
+    });
+
+    // let ageCompValue = Math.round((ageMin + ageMax)/2);
+    let ageCompValue = 40;
+    var slidersDiv = d3.select("#divForSlider").append("div");
+    slidersDiv.append("div").text("Age to Compare Against")
+      .append("div").append("input")
+      .attr("type", "range")
+      .style("width","300px")
+      .attr("min", Math.round(ageMin))
+      .attr("max", Math.round(ageMax))
+      .attr("step", 1)
+      .attr("value",ageCompValue)
+      .on("input", function () {
+        ageCompValue = Number(this.value);
+        //Call showCircles with the hue value selected on the slider
+        // showCircles(Number(this.value));
+    });
+
+    //Legend for selecting data points based on category
+    colorScale.domain().forEach(function(d,i) {
+        d3.select("#ourLegend")
+          .append("span").text(d)
+          .style("font-size", "30px")
+          .style("padding", "20px")
+          .style("margin-left", "50px")
+          .style("color", colorScale(d))
+          .on("mouseover", function() {
+            let totalRatingYoung = 0;
+            let numYoung = 0;
+            let totalRatingOld = 0;
+            let numOld = 0;
+            scatter.selectAll("circle").each(function() {
+              let circle = d3.select(this);
+              if (circle.attr("restaurantType") === d) {
+                circle.attr("opacity", 0.8);
+                if (ageInvScale(circle.attr("cx")) < ageCompValue) {
+                  totalRatingYoung = totalRatingYoung + ratingInvScale(circle.attr("cy"));
+                  numYoung = numYoung + 1;
+                } else {
+                  totalRatingOld = totalRatingOld + ratingInvScale(circle.attr("cy"));
+                  numOld = numOld + 1;
+                }
+              }
+              else {
+                circle.attr("opacity", 0.1);
+              }
+            })
+            console.log(totalRatingYoung/numYoung);
+            console.log(totalRatingOld/numOld);
+
+            //I don't want NaN to be displayed, so rather than dividing by 0, I divide by 1
+            if (numYoung == 0) {
+              numYoung = 1;
+            }
+            if (numOld == 0) {
+              numOld = 1;
+            }
+            d3.select("#ourAverages").html("")
+              .append("p").text(d)
+              .style("font-size", "25px")
+              .style("padding", "20px")
+              .style("margin-left", "50px")
+              .style("color", colorScale(d))
+              .append("p").text("Average Rating for People who are younger than " + ageCompValue + ": " + Math.round(100*(totalRatingYoung/numYoung))/100)
+              .append("p").text("Average Rating for People who are older than " + ageCompValue + ": " + Math.round(100*(totalRatingOld/numOld))/100);
+          })
+          .on("mouseout", function() {
             scatter.selectAll("circle").each(function() {
               let circle = d3.select(this);
               circle.attr("opacity", 0.8);
             })
-          });
-      }
-      if (yelpData[d.zip].Chinese != null) {
-        let ratingChinese = ratingScale((yelpData[d.zip].Chinese.star_total)/(yelpData[d.zip].Chinese.count));
-
-        let circle3 = scatter.append("circle")
-                .attr("cx", age)
-                .attr("cy", ratingChinese)
-                .attr("r", 4)
-                .attr("opacity", 0.8)
-                .style("fill", "green")
-                .attr("zip", d.zip)
-                .attr("id", "C" + d.zip + "Chinese")
-                .attr("restaurantType", "Chinese")
-
-      d3.select("#C" + d.zip + "Chinese")
-      .on("mouseover", function() {
-            scatter.append("text")
-              .attr("id", "A" + d.zip + "Chinese")
-              .attr("x", age)
-              .attr("y", ratingChinese -15)
-              .text("Zip:" + d.zip)
-            scatter.selectAll("circle").each(function() {
-              let circleWithSameZip = d3.select(this);
-              if (circleWithSameZip.attr("zip") === d.zip) {
-                circleWithSameZip.attr("opacity", 0.8);
-              }
-              else {
-                circleWithSameZip.attr("opacity", 0.1);
-              }
-            })
-        });
-        d3.select("#C" + d.zip + "Chinese")
-        .on("mouseout", function() {
-          d3.select("#A" + d.zip + "Chinese").remove();
-          scatter.selectAll("circle").each(function() {
-            let circle = d3.select(this);
-            circle.attr("opacity", 0.8);
+            d3.select("#ourAverages").html("");
           })
         });
-      }
-      if (yelpData[d.zip].Japanese != null) {
-        let ratingJapanese = ratingScale((yelpData[d.zip].Japanese.star_total)/(yelpData[d.zip].Japanese.count));
-
-        let circle4 = scatter.append("circle")
-                .attr("cx", age)
-                .attr("cy", ratingJapanese)
-                .attr("r", 4)
-                .attr("opacity", 0.8)
-                .style("fill", "orange")
-                .attr("zip", d.zip)
-                .attr("id", "C" + d.zip + "Japanese")
-                .attr("restaurantType", "Japanese")
-
-        d3.select("#C" + d.zip + "Japanese")
-        .on("mouseover", function() {
-              scatter.append("text")
-                .attr("id", "A" + d.zip + "Japanese")
-                .attr("x", age)
-                .attr("y", ratingJapanese-15)
-                .text("Zip:" + d.zip)
-              scatter.selectAll("circle").each(function() {
-                let circleWithSameZip = d3.select(this);
-                if (circleWithSameZip.attr("zip") === d.zip) {
-                  circleWithSameZip.attr("opacity", 0.8);
-                }
-                else {
-                  circleWithSameZip.attr("opacity", 0.1);
-                }
-              })
-        });
-
-        d3.select("#C" + d.zip + "Japanese")
-        .on("mouseout", function() {
-          d3.select("#A" + d.zip + "Japanese").remove();
-          scatter.selectAll("circle").each(function() {
-            let circle = d3.select(this);
-            circle.attr("opacity", 0.8);
-          })
-        });
-      }
-
-    }
-  });
-
-  colorScale.domain().forEach(function(d,i) {
-      d3.select("#ourLegend")
-        .append("span").text(d)
-        .style("font-size", "30px")
-        .style("padding", "20px")
-        .style("color", colorScale(d))
-        .on("mouseover", function() {
-          scatter.selectAll("circle").each(function() {
-            let circle = d3.select(this);
-            if (circle.attr("restaurantType") === d) {
-              circle.attr("opacity", 0.8);
-            }
-            else {
-              circle.attr("opacity", 0.1);
-            }
-          })
-        })
-        .on("mouseout", function() {
-          scatter.selectAll("circle").each(function() {
-            let circle = d3.select(this);
-            circle.attr("opacity", 0.8);
-          })
-        })
-      });
-}
-requestData();
+  }
+  requestData();
 
 </script>
 
