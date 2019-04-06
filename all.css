@@ -1,0 +1,58 @@
+body {
+  padding-left: 10px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
+  margin: 0;
+  padding: 0;
+}
+
+#header {
+  background-color: #d32323;
+}
+
+#header p{
+  background-color: #d32323;
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+h1 {
+  margin-bottom: 0px;
+}
+
+
+#ageYelpPlot {
+  float: left;
+}
+#ourAverages {
+  float: none;
+  margin-top: 80px;
+}
+
+#divForSlider {
+  padding-top: 10px;
+}
+
+#leftP {
+  width: 48%;
+  float: left;
+}
+
+#rightP {
+  float: right;
+  width: 50%;
+  text-align: right;
+  padding-left: 0px;
+  padding-right: 10px;
+}
+
+/* .gridlines line {
+  stroke: black;
+} */
+
+.gridlines .domain {
+  stroke : none;
+}
+
+/* .ticks text {
+  fill : white
+} */

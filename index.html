@@ -4,7 +4,32 @@
   <meta charset="UTF-8">
   <title>Project 2</title>
   <script src="https://d3js.org/d3.v5.min.js"></script>
+  <!-- <link rel="stylesheet" type="text/css" href="all.css"> -->
   <style>
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
+    margin: 0;
+    padding: 0;
+  }
+
+  span {
+    padding-left: 10px;
+  }
+
+  #header, #rightP, #leftP {
+    background-color: #d32323;
+    color: white;
+    padding-bottom: 10px;
+  }
+
+  #header {
+    padding-top: 10px;
+  }
+
+  #title {
+    font-size: 30px;
+  }
+
   #ageYelpPlot {
     float: left;
   }
@@ -12,9 +37,43 @@
     float: none;
     margin-top: 80px;
   }
+
+  svg {
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+
+  #ourLegend {
+    padding-bottom: 10px;
+  }
+
+  #divForSlider {
+    color: #d32323;
+    background-color: #fcd6d3;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-bottom: 10px;
+  }
+
+  .gridlines .domain {
+    stroke : none;
+  }
+
+  /* input {
+    -webkit-appearance: none;
+    height: 25px;
+    width: 100%;
+  } */
+
+
   </style>
 </head>
 <body>
+<div id="header">
+  <span id="title">Average Rating For Types of Cusine Based on Age Group and ZipCode.</span><br/>
+  <span id="leftP">Anthony Verghese (akv26), Sam Ringel (sjr254), Isaiah Wilson (ijw23)</span><br/>
+  <span id="rightP">INF0 3300</span>
+</div>
 <svg width="800" height="600" id="ageYelpPlot"></svg>
 <div id="ourAverages" max-width = "800"></div>
 <div id="ourLegend" max-width = "800"></div>
@@ -23,7 +82,7 @@
   let svg = d3.select("svg#ageYelpPlot");
   let width = svg.attr("width");
   let height = svg.attr("height");
-  let margin = { top: 10, right: 10, bottom: 50, left:50};
+  let margin = { top: 10, right: 10, bottom: 60, left:60};
   let chartWidth = width - margin.left - margin.right;
   let chartHeight = height - margin.top - margin.bottom;
 
@@ -59,23 +118,23 @@
     let arrayOfRestaurantTypes = ["Italian", "Mexican", "Chinese", "Japanese"];
     const colorScale = d3.scaleOrdinal()
       .domain(arrayOfRestaurantTypes)
-      .range(["blue", "red", "green", "orange"]);
+      .range(["blue", "red", "green", "darkorange"]);
 
      // Y axis ticks
      let leftAxis = d3.axisLeft(ratingScale);
-     svg.append("g")
+     svg.append("g").attr("class", "ticks")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftAxis);
 
      // X axis ticks
      let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format(".01s"));
-     let element = svg.append("g")
+     let element = svg.append("g").attr("class", "ticks")
        .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
      bottomAxis(element);
 
      // Y axis gridlines
      let leftGridlines = d3.axisLeft(ratingScale).tickSize(-chartWidth-10).tickFormat("");
-     svg.append("g")
+     svg.append("g").attr("class", "gridlines")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftGridlines);
 
@@ -84,6 +143,18 @@
      element = svg.append("g").attr("class", "gridlines")
        .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
      bottomGridlines(element);
+
+     svg.append("text")
+        .attr("x", (width/2))
+        .attr("y", chartHeight + margin.bottom+5)
+        .text("Age");
+
+
+     svg.append("text")
+        .attr("transform", "translate("+ (-285) +","+ ((height/2)+50) +") rotate(-90)")
+        .attr("x", margin.left)
+        .attr("y", (height/2))
+        .text("Rating");
 
     let scatter = svg.append("g")
            .attr("transform","translate("+margin.left+","+margin.top+")");
@@ -219,7 +290,7 @@
                   .attr("cy", ratingJapanese)
                   .attr("r", 4)
                   .attr("opacity", 0.8)
-                  .style("fill", "orange")
+                  .style("fill", "darkorange")
                   .attr("zip", d.zip)
                   .attr("id", "C" + d.zip + "Japanese")
                   .attr("restaurantType", "Japanese")
@@ -332,6 +403,5 @@
   requestData();
 
 </script>
-
 </body>
 </html>
