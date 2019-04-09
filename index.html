@@ -158,6 +158,7 @@
                     .attr("opacity", 0.8)
                     .style("fill", colorScale(key))
                     .attr("zip", d.zip)
+                    .attr("city", yelpData[d.zip].city)
                     .attr("id", "C" + d.zip + typeKey)
                     .attr("restaurantType", typeKey)
 
@@ -167,10 +168,10 @@
                     .attr("id", "A" + d.zip + typeKey)
                     .attr("x", age - 80)
                     .attr("y", rating - 15)
-                    .text("Zip:" + d.zip)
+                    .text("City:" + yelpData[d.zip].city)
                   scatter.selectAll("circle").each(function() {
                     let circleWithSameZip = d3.select(this);
-                    if (circleWithSameZip.attr("zip") === d.zip) {
+                    if (circleWithSameZip.attr("city") === yelpData[d.zip].city) {
                       circleWithSameZip.attr("opacity", 0.8).attr("r", 8);
                     }
                     else {
