@@ -30,8 +30,8 @@
     'Fast Food': ['Fast Food'],
     'Mexican': ['Mexican'],
     'Sandwiches': ['Sandwiches'],
-    'Pizza': ['Pizza'], 
-    'Breakfast & Brunch': ['Breakfast & Brunch'], 
+    'Pizza': ['Pizza'],
+    'Breakfast & Brunch': ['Breakfast & Brunch'],
     'Burgers': ['Burgers'],
     'Chinese': ['Chinese'],
     'Italian': ['Italian'],
@@ -73,7 +73,7 @@
 
     //rating scale is used for y axis
     const ratingScale = d3.scaleLinear()
-            .domain([0, 5])
+            .domain([1.5, 4.5])
             .range([chartHeight, 0]);
 
     const ratingInvScale = d3.scaleLinear()
@@ -82,16 +82,16 @@
 
     const colorScale = d3.scaleOrdinal()
       .domain(arrayOfRestaurantTypes)
-      .range(['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','#ffff99']);
+      .range(['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','Brown']);
 
      // Y axis ticks
-     let leftAxis = d3.axisLeft(ratingScale);
+     let leftAxis = d3.axisLeft(ratingScale).ticks(5, d3.format(".1s"));
      svg.append("g").attr("class", "ticks")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftAxis);
 
      // X axis ticks
-     let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format(".01s"));
+     let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format("0s"));
      let element = svg.append("g").attr("class", "ticks")
        .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
      bottomAxis(element);
@@ -118,7 +118,7 @@
         .attr("transform", "translate("+ (-285) +","+ ((height/2)+50) +") rotate(-90)")
         .attr("x", margin.left)
         .attr("y", (height/2))
-        .text("Rating");
+        .text("Rating (out of 5)");
 
     let scatter = svg.append("g")
            .attr("transform","translate("+margin.left+","+margin.top+")");
@@ -211,7 +211,7 @@
     colorScale.domain().forEach(function(d,i) {
         d3.select("#ourLegend")
           .append("span").text(d)
-          .style("font-size", "30px")
+          .style("font-size", "20px")
           .style("padding", "20px")
           .style("margin-left", "50px")
           .style("color", colorScale(d))
