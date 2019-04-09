@@ -12,8 +12,10 @@
   <div id="leftP"><span>Anthony Verghese (akv26), Sam Ringel (sjr254), Isaiah Wilson (ijw23)</span></div>
   <div id="rightP"><span>INFO 3300</span></div>
 </div>
-<svg width="800" height="600" id="ageYelpPlot"></svg>
+<svg width="800" height="500" id="ageYelpPlot"></svg>
 <div id="ourAverages" max-width = "800"></div>
+<br/>
+<br/>
 <div id="ourLegend" max-width = "800"></div>
 <div id="divForSlider"></div>
 <script>
@@ -212,8 +214,8 @@
         d3.select("#ourLegend")
           .append("span").text(d)
           .style("font-size", "20px")
-          .style("padding", "20px")
-          .style("margin-left", "50px")
+          .style("margin-right", "10px")
+          .style("margin-bottom", "25px")
           .style("color", colorScale(d))
           .on("mouseover", function() {
             let totalRatingYoung = 0;
@@ -247,11 +249,12 @@
             d3.select("#ourAverages").html("")
               .append("p").text(d)
               .style("font-size", "25px")
-              .style("padding", "20px")
+              .style("padding", "30px")
               .style("margin-left", "50px")
+              .style("margin-bottom", "30px")
               .style("color", colorScale(d))
-              .append("p").text("Average Rating for People who are younger than " + ageCompValue + ": " + Math.round(100*(totalRatingYoung/numYoung))/100)
-              .append("p").text("Average Rating for People who are older than " + ageCompValue + ": " + Math.round(100*(totalRatingOld/numOld))/100);
+              .append("p").text("Average Rating for Average Age younger than " + ageCompValue + ": " + Math.round(100*(totalRatingYoung/numYoung))/100)
+              .append("p").text("Average Rating for Average Age older than " + ageCompValue + ": " + Math.round(100*(totalRatingOld/numOld))/100);
           })
           .on("mouseout", function() {
             scatter.selectAll("circle").each(function() {

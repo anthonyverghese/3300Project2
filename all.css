@@ -53,6 +53,7 @@ h1 {
   float: left;
   padding-top: 10px;
   padding-left: 10px;
+  margin-bottom: 20px;
 }
 
 #ourAverages {
@@ -61,10 +62,12 @@ h1 {
 }
 
 #ourLegend {
+  float: left;
   padding-bottom: 10px;
 }
 
 #divForSlider {
+  float: left;
   color: #d32323;
   background-color: #fcd6d3;
   padding-top: 10px;
@@ -171,4 +174,3 @@ input:focus::-ms-fill-lower {
 input:focus::-ms-fill-upper {
   background: #d32323;
 }
-
