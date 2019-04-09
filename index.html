@@ -63,8 +63,6 @@
     //ageScale is used for x axis
     const ageMin = d3.min(ageData, d => isValidZip(d.zip) ? d.age :  100);
     const ageMax = d3.max(ageData, d => isValidZip(d.zip) ? d.age : 0);
-    console.log(ageMax)
-    console.log(ageMin)
     const ageScale = d3.scaleLinear()
             .domain([ageMin - 1, ageMax + 1])
             .range([0, chartWidth]);
@@ -126,7 +124,7 @@
            .attr("transform","translate("+margin.left+","+margin.top+")");
 
     ageData.forEach(function (d) {
-      let age = ageScale(d.age);
+      let age = ageScale(d.age.toString());
       if (yelpData[d.zip] != null) {
         const cats = yelpData[d.zip]['cats'];
         Object.entries(mapofRestaurantTypes).forEach((mapping) => {
