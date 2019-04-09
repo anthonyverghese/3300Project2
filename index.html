@@ -4,75 +4,13 @@
   <meta charset="UTF-8">
   <title>Project 2</title>
   <script src="https://d3js.org/d3.v5.min.js"></script>
-  <!-- <link rel="stylesheet" type="text/css" href="all.css"> -->
-  <style>
-  body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
-    margin: 0;
-    padding: 0;
-  }
-
-  span {
-    padding-left: 10px;
-  }
-
-  #header, #rightP, #leftP {
-    background-color: #d32323;
-    color: white;
-    padding-bottom: 10px;
-  }
-
-  #header {
-    padding-top: 10px;
-  }
-
-  #title {
-    font-size: 30px;
-  }
-
-  #ageYelpPlot {
-    float: left;
-  }
-  #ourAverages {
-    float: none;
-    margin-top: 80px;
-  }
-
-  svg {
-    padding-top: 10px;
-    padding-left: 10px;
-  }
-
-  #ourLegend {
-    padding-bottom: 10px;
-  }
-
-  #divForSlider {
-    color: #d32323;
-    background-color: #fcd6d3;
-    padding-top: 10px;
-    padding-left: 10px;
-    padding-bottom: 10px;
-  }
-
-  .gridlines .domain {
-    stroke : none;
-  }
-
-  /* input {
-    -webkit-appearance: none;
-    height: 25px;
-    width: 100%;
-  } */
-
-
-  </style>
+  <link rel="stylesheet" type="text/css" href="all.css">
 </head>
 <body>
 <div id="header">
-  <span id="title">Average Rating For Types of Cuisines Based on Average Age of Zip Code Residents</span><br/>
-  <span id="leftP">Anthony Verghese (akv26), Sam Ringel (sjr254), Isaiah Wilson (ijw23)</span><br/>
-  <span id="rightP">INF0 3300</span>
+  <div id="title"><span>Average Rating For Types of Cuisines Based on Average Age of Zip Code Residents</span></div><br/>
+  <div id="leftP"><span>Anthony Verghese (akv26), Sam Ringel (sjr254), Isaiah Wilson (ijw23)</span></div>
+  <div id="rightP"><span>INFO 3300</span></div>
 </div>
 <svg width="800" height="600" id="ageYelpPlot"></svg>
 <div id="ourAverages" max-width = "800"></div>
@@ -115,8 +53,6 @@
         const value = mapofRestaurantTypes[key];
         if (cats[value[0]] != null) {
           if (value.length > 1 && cats[value[1]] != null) {
-            console.log(cats)
-            console.log(cats[value[0]].count + cats[value[1]].count)
             if (cats[value[0]].count + cats[value[1]].count > 15) { return true; }
           } else if (cats[value[0]].count > 15) return true;
         } else if (value.length > 1 && cats[value[1]] != null && cats[value[1]].count > 15) return true;
@@ -127,10 +63,11 @@
     //ageScale is used for x axis
     const ageMin = d3.min(ageData, d => isValidZip(d.zip) ? d.age :  100);
     const ageMax = d3.max(ageData, d => isValidZip(d.zip) ? d.age : 0);
+    console.log(ageMax)
+    console.log(ageMin)
     const ageScale = d3.scaleLinear()
             .domain([ageMin - 1, ageMax + 1])
             .range([0, chartWidth]);
-
 
     const ageInvScale = d3.scaleLinear()
             .domain([0, chartWidth])
@@ -209,7 +146,7 @@
             count = cats[value[1]].count;
             score = cats[value[1]].star_total;
           }
-          if (score != undefined && count >= 15) {
+          if (score != undefined && count >= 5) {
             let rating = ratingScale(score / count);
 
             const typeKey = key.split(' ')[0];
@@ -301,8 +238,6 @@
                 circle.attr("opacity", 0.1);
               }
             })
-            console.log(totalRatingYoung/numYoung);
-            console.log(totalRatingOld/numOld);
 
             //I don't want NaN to be displayed, so rather than dividing by 0, I divide by 1
             if (numYoung == 0) {
