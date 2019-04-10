@@ -252,21 +252,21 @@
     }
 
     d3.select("#ourLegend")
-          .append("button")
-          .text("Select all")
-          .attr("class", "allbutton")
-          .on("click", () => {
-            changeCats(arrayOfRestaurantTypes, true)
-            d3.selectAll("#ourLegend button.deselected").attr("class", "selected")
-          })
+        .append("button")
+        .text("Show all")
+        .attr("class", "allbutton")
+        .on("click", (d, i, nodes) => {
+          changeCats(arrayOfRestaurantTypes, true)
+          d3.selectAll("#ourLegend button.deselected").attr("class", "selected")
+        })
     d3.select("#ourLegend")
-          .append("button")
-          .text("Deselect all")
-          .attr("class", "allbutton")
-          .on("click", () => {
-            changeCats(arrayOfRestaurantTypes, false)
-            d3.selectAll("#ourLegend button.selected").attr("class", "deselected")
-          })
+        .append("button")
+        .text("Hide all")
+        .attr("class", "allbutton")
+        .on("click", (d, i, nodes) => {
+          changeCats(arrayOfRestaurantTypes, false)
+          d3.selectAll("#ourLegend button.selected").attr("class", "deselected")
+        })
 
     //Legend for selecting data points based on category
     arrayOfRestaurantTypes.forEach(d => {
