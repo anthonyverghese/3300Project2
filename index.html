@@ -173,7 +173,7 @@
                   scatter.selectAll("circle").each(function() {
                     let circleWithSameZip = d3.select(this);
                     if (circleWithSameZip.attr("city") === yelpData[d.zip].city) {
-                      circleWithSameZip.attr("opacity", 0.8).attr("r", 8);
+                      circleWithSameZip.attr("opacity", 0.8).attr("r", 6);
                     }
                     else {
                       circleWithSameZip.attr("opacity", 0.1);
