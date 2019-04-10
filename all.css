@@ -1,6 +1,11 @@
 body {
   padding-left: 10px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
+  /* font-family: 'Aldrich', sans-serif; */
+  /* font-family: 'Racing Sans One', cursive; */
+  /* font-family: 'Gugi', cursive; */
+  /* font-family: 'Audiowide', cursive; */
+  /* font-family: 'Fugaz One', cursive; */
   margin: 0;
   padding: 0;
 }
@@ -63,20 +68,18 @@ h1 {
 
 #ourLegend {
   float: left;
-  padding-bottom: 10px;
+  padding-left: 10px;
+  /* padding-bottom: 10px; */
+  padding-top: 10px;
 }
 
 #divForSlider {
   float: left;
   color: #d32323;
-  background-color: #fcd6d3;
-  padding-top: 10px;
+  /* background-color: #fcd6d3; */
+  /* padding-top: 10px; */
   padding-left: 10px;
-  padding-bottom: 10px;
-}
-
-#ourLegend {
-  padding-left: 10px;
+  /* padding-bottom: 10px; */
 }
 
 /* .gridlines line {
@@ -97,7 +100,7 @@ input {
   height: 25px;
   width: 100%;
   margin: 10px 0px;
-  background: #fcd6d3;
+  /* background: #fcd6d3; */
 }
 
 input:focus {

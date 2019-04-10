@@ -5,6 +5,7 @@
   <title>Project 2</title>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <link rel="stylesheet" type="text/css" href="all.css">
+  <link href="https://fonts.googleapis.com/css?family=Aldrich|Audiowide|Fugaz+One|Gugi|Racing+Sans+One" rel="stylesheet">
 </head>
 <body>
 <div id="header">
@@ -75,7 +76,7 @@
 
     //rating scale is used for y axis
     const ratingScale = d3.scaleLinear()
-            .domain([1.5, 4.5])
+            .domain([0, 5])
             .range([chartHeight, 0]);
 
     const ratingInvScale = d3.scaleLinear()
@@ -117,7 +118,7 @@
 
 
      svg.append("text")
-        .attr("transform", "translate("+ (-285) +","+ ((height/2)+50) +") rotate(-90)")
+        .attr("transform", "translate("+ (-235) +","+ ((height/2)+50) +") rotate(-90)")
         .attr("x", margin.left)
         .attr("y", (height/2))
         .text("Rating (out of 5)");
