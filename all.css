@@ -67,7 +67,7 @@ h1 {
 }
 
 #ourLegend {
-  float: left;
+  float: none;
   padding-left: 10px;
   /* padding-bottom: 10px; */
   padding-top: 10px;
@@ -101,11 +101,13 @@ h1 {
 }
 
 #divForSlider {
-  float: left;
+  /* float: left; */
+  position: absolute;
+  left: 60px;
   color: #d32323;
   /* background-color: #fcd6d3; */
   /* padding-top: 10px; */
-  padding-left: 10px;
+  /* padding-left: 10px; */
   /* padding-bottom: 10px; */
 }
 
