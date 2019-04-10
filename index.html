@@ -14,10 +14,10 @@
   <div id="rightP"><span>INFO 3300</span></div>
 </div>
 <svg width="800" height="500" id="ageYelpPlot"></svg>
-<div id="ourAverages" max-width = "800"></div>
-<br/>
-<br/>
 <div id="ourLegend" max-width = "800"></div>
+<br/>
+<br/>
+<div id="ourAverages" max-width = "800"></div>
 <div id="divForSlider"></div>
 <script>
   let svg = d3.select("svg#ageYelpPlot");
@@ -126,8 +126,9 @@
     let scatter = svg.append("g")
            .attr("transform","translate("+margin.left+","+margin.top+")");
 
+    let pointsData = [];
+
     ageData.forEach(function (d) {
-      let age = ageScale(d.age.toString());
       if (yelpData[d.zip] != null) {
         const cats = yelpData[d.zip]['cats'];
         Object.entries(mapofRestaurantTypes).forEach((mapping) => {
@@ -148,78 +149,114 @@
             score = cats[value[1]].star_total;
           }
           if (score != undefined && count >= 5) {
-            let rating = ratingScale(score / count);
-
-            const typeKey = key.split(' ')[0];
-
-            let circle = scatter.append("circle")
-                    .attr("cx", age)
-                    .attr("cy", rating)
-                    .attr("r", 4)
-                    .attr("opacity", 0.8)
-                    .style("fill", colorScale(key))
-                    .attr("zip", d.zip)
-                    .attr("city", yelpData[d.zip].city)
-                    .attr("id", "C" + d.zip + typeKey)
-                    .attr("restaurantType", typeKey)
-
-            d3.select("#C" + d.zip + typeKey)
-            .on("mouseover", function() {
-                  scatter.append("text")
-                    .attr("id", "A" + d.zip + typeKey)
-                    .attr("x", age - 80)
-                    .attr("y", rating - 15)
-                    .text("City:" + yelpData[d.zip].city)
-                  scatter.selectAll("circle").each(function() {
-                    let circleWithSameZip = d3.select(this);
-                    if (circleWithSameZip.attr("city") === yelpData[d.zip].city) {
-                      circleWithSameZip.attr("opacity", 0.8).attr("r", 6);
-                    }
-                    else {
-                      circleWithSameZip.attr("opacity", 0.1);
-                    }
-                })
-            });
-
-            d3.select("#C" + d.zip + typeKey)
-            .on("mouseout", function() {
-              d3.select("#A" + d.zip + typeKey).remove();
-              scatter.selectAll("circle").each(function() {
-                let circle = d3.select(this);
-                circle.attr("opacity", 0.8).attr("r", 4);
-              })
-            });
+            pointsData.push({
+              age: d.age.toString(),
+              rating: score / count,
+              cat: key,
+              zip: d.zip,
+              city: yelpData[d.zip].city,
+              state: yelpData[d.zip].state,
+              key: key.split(' ')[0]
+            })
           }
         })
       }
     });
 
+    let points = scatter.selectAll('circle').data(pointsData)
+
+    points.enter().append("circle")
+        .attr("cx", d => ageScale(d.age))
+        .attr("cy", d => ratingScale(d.rating))
+        .attr("r", 4)
+        .attr("opacity", 0.8)
+        .style("fill", d => colorScale(d.cat))
+        .attr("zip", d => d.zip)
+        .attr("city", d => d.city + ", " + d.state)
+        .attr("id", d => "C" + d.zip + d.key)
+        .attr("restaurantType", d => d.key)
+        .on("mouseover", d => {
+          scatter.append("text")
+            .attr("id", "A" + d.zip + d.key)
+            .attr("x", ageScale(d.age) - 80)
+            .attr("y", ratingScale(d.rating) - 15)
+            .text("City: " + d.city + ", " + d.state)
+          scatter.selectAll("circle").each(function() {
+            let circleWithSameZip = d3.select(this);
+            if (circleWithSameZip.attr("city") === d.city + ", " + d.state) {
+              circleWithSameZip.attr("opacity", 0.8).attr("r", 6);
+            }
+            else {
+              circleWithSameZip.attr("opacity", 0.1);
+            }
+          })
+        })
+        .on("mouseout", d => {
+          d3.select("#A" + d.zip + d.key).remove();
+          scatter.selectAll("circle").each(function() {
+            let circle = d3.select(this);
+            circle.attr("opacity", 0.8).attr("r", 4);
+          })
+        })
+
     // let ageCompValue = Math.round((ageMin + ageMax)/2);
     let ageCompValue = 40;
     var slidersDiv = d3.select("#divForSlider").append("div");
     slidersDiv.append("div").text("Age to Compare Against")
-      .append("div").append("input")
-      .attr("type", "range")
-      .style("width","300px")
-      .attr("min", Math.round(ageMin))
-      .attr("max", Math.round(ageMax))
-      .attr("step", 1)
-      .attr("value",ageCompValue)
-      .on("input", function () {
-        ageCompValue = Number(this.value);
-        //Call showCircles with the hue value selected on the slider
-        // showCircles(Number(this.value));
-    });
+        .append("div").append("input")
+        .attr("type", "range")
+        .style("width","300px")
+        .attr("min", Math.round(ageMin))
+        .attr("max", Math.round(ageMax))
+        .attr("step", 1)
+        .attr("value",ageCompValue)
+        .on("input", function () {
+          ageCompValue = Number(this.value);
+          //Call showCircles with the hue value selected on the slider
+          // showCircles(Number(this.value));
+        });
+
+    let isCatDisplayeds = {}
+    arrayOfRestaurantTypes.forEach((title) => {
+      isCatDisplayeds[title] = true
+    })
+
+    const changeCats = (cats, isAdding) => {
+      cats.forEach((cat) => {
+        isCatDisplayeds[cat] = isAdding
+      })
+
+      scatter.selectAll('circle').data(pointsData).style("display", d => isCatDisplayeds[d.cat] ? "" : "none")
+    }
+
+    d3.select("#ourLegend")
+          .append("button")
+          .text("Select all")
+          .attr("class", "allbutton")
+          .on("click", () => {
+            changeCats(arrayOfRestaurantTypes, true)
+            d3.selectAll("#ourLegend button.deselected").attr("class", "selected")
+          })
+    d3.select("#ourLegend")
+          .append("button")
+          .text("Deselect all")
+          .attr("class", "allbutton")
+          .on("click", () => {
+            changeCats(arrayOfRestaurantTypes, false)
+            d3.selectAll("#ourLegend button.selected").attr("class", "deselected")
+          })
 
     //Legend for selecting data points based on category
-    colorScale.domain().forEach(function(d,i) {
-        d3.select("#ourLegend")
-          .append("span").text(d)
-          .style("font-size", "20px")
-          .style("margin-right", "10px")
-          .style("margin-bottom", "25px")
+    arrayOfRestaurantTypes.forEach(d => {
+        let selectDiv = d3.select("#ourLegend")
+          .append("div")
+          .attr("id", d.split(' ')[0] + "-select-div")
+
+        selectDiv.append("button").text(d)
+          .style("border-color", colorScale(d))
           .style("color", colorScale(d))
-          .on("mouseover", function() {
+          .attr("class", "selected")
+          /*.on("mouseover", function() {
             let totalRatingYoung = 0;
             let numYoung = 0;
             let totalRatingOld = 0;
@@ -264,6 +301,10 @@
               circle.attr("opacity", 0.8);
             })
             d3.select("#ourAverages").html("");
+          })*/
+          .on("click", function() {
+            d3.select(this).attr("class", isCatDisplayeds[d] ? "deselected" : "selected")
+            changeCats([d], !isCatDisplayeds[d])
           })
         });
   }

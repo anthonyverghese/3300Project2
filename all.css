@@ -73,6 +73,33 @@ h1 {
   padding-top: 10px;
 }
 
+#ourLegend button {
+  width: 300px;
+  height: 30px;
+  margin-bottom: 7px;
+  font-weight: bold;
+  border-radius: 10px;
+}
+
+#ourLegend button.allbutton {
+  background-color: darkblue;
+  color: white;
+  border-width: 0px;
+  width: 145px;
+  margin-right: 10px;
+}
+
+#ourLegend button.deselected {
+  background-color: white;
+  border-width: 1px;
+  opacity: 0.5;
+}
+
+#ourLegend button.selected {
+  background-color: #eeffff;
+  border-width: 2px;
+}
+
 #divForSlider {
   float: left;
   color: #d32323;
