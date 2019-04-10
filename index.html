@@ -9,7 +9,7 @@
 </head>
 <body>
 <div id="header">
-  <div id="title"><span>Average Rating For Types of Cuisines Based on Average Age of Zip Code Residents</span></div><br/>
+  <div id="title"><span>The Age of Residents Around a Restaraunt Doesn't Have Much Effect on its Rating</span></div><br/>
   <div id="leftP"><span>Anthony Verghese (akv26), Sam Ringel (sjr254), Isaiah Wilson (ijw23)</span></div>
   <div id="rightP"><span>INFO 3300</span></div>
 </div>
@@ -114,14 +114,14 @@
      svg.append("text")
         .attr("x", (width/2))
         .attr("y", chartHeight + margin.bottom+5)
-        .text("Age");
+        .text("Average resident age");
 
 
      svg.append("text")
         .attr("transform", "translate("+ (-235) +","+ ((height/2)+50) +") rotate(-90)")
         .attr("x", margin.left)
         .attr("y", (height/2))
-        .text("Rating (out of 5)");
+        .text("Average Yelp rating");
 
     let scatter = svg.append("g")
            .attr("transform","translate("+margin.left+","+margin.top+")");
