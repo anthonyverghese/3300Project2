@@ -61,6 +61,10 @@ h1 {
   margin-bottom: 20px;
 }
 
+#ageBarChart {
+  padding-left: 10px;
+}
+
 #ourAverages {
   float: none;
   margin-top: 80px;

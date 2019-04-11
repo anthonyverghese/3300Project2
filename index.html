@@ -23,9 +23,12 @@
 <br/>
 <br/>
 <div id="ourAverages" max-width = "800"></div>
+<svg id="ageBarChart" width="800" height="500">
+</svg>
 
 <script>
   let svg = d3.select("svg#ageYelpPlot");
+  let svg2 = d3.select("svg#ageBarChart");
   let width = svg.attr("width");
   let height = svg.attr("height");
   let margin = { top: 10, right: 10, bottom: 70, left: 60 };
@@ -77,33 +80,9 @@
             .domain([ageMin - 1, ageMax + 1])
             .range([0, chartWidth]);
 
-    let ageCompValue = 40;
-
-    // let ageCompValue = Math.round((ageMin + ageMax)/2);
-    // let ageCompValue = 40;
-    var slidersDiv = d3.select("#divForSlider").append("div");
-    slidersDiv.append("div").text("Age to Compare Against")
-        .append("div").append("input")
-        .attr("type", "range")
-        .style("width","750px")
-        .attr("min", Math.round(ageMin))
-        .attr("max", Math.round(ageMax))
-        .attr("step", 1)
-        .attr("value",ageCompValue)
-        .on("input", function () {
-          ageCompValue = Number(this.value);
-          console.log(ageCompValue);
-          // svg.remove("line");
-          d3.select("#myLine")
-           .attr("x1", ageScale(ageCompValue) + margin.left + "px")
-           .attr("y1", "10px")
-           .attr("x2", ageScale(ageCompValue) + + margin.left + "px")
-           .attr("y2", "455px")
-           .style("stroke", "#d32323")
-           .style("stroke-width", "3px")
-          //Call showCircles with the hue value selected on the slider
-          // showCircles(Number(this.value));
-        });
+    const barScale = d3.scaleBand()
+            .domain(["left average", "right average"])
+            .range([0,chartWidth]);
 
     const ageInvScale = d3.scaleLinear()
             .domain([0, chartWidth])
@@ -147,18 +126,39 @@
      bottomGridlines(element);
 // <line x1="5" y1="5" x2="40" y2="40" stroke="gray" stroke-width="5"  />
 
+    // Y axis ticks for bar graph
+    let leftAxis2 = d3.axisLeft(ratingScale).ticks(5, d3.format(".1s"));
+     svg2.append("g").attr("class", "ticks")
+       .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
+       .call(leftAxis2);
 
-     svg.append("text")
-        .attr("x", (width/2))
-        .attr("y", chartHeight + margin.bottom+5)
-        .text("Average resident age");
+     // X axis ticks
+    let bottomAxis2 = d3.axisBottom(barScale);
+    let element2 = svg2.append("g").attr("class", "ticks")
+       .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
+    bottomAxis2(element2);
 
+    svg.append("text")
+      .attr("x", (width/2))
+      .attr("y", chartHeight + margin.bottom+5)
+      .text("Average resident age");
 
-     svg.append("text")
-        .attr("transform", "translate("+ (-235) +","+ ((height/2)+50) +") rotate(-90)")
-        .attr("x", margin.left)
-        .attr("y", (height/2))
-        .text("Average Yelp rating");
+    svg.append("text")
+      .attr("transform", "translate("+ (-235) +","+ ((height/2)+50) +") rotate(-90)")
+      .attr("x", margin.left)
+      .attr("y", (height/2))
+      .text("Average Yelp rating");
+
+    svg2.append("text")
+      .attr("x", (width/2))
+      .attr("y", chartHeight + margin.bottom+5)
+      .text("Averages");
+
+    svg2.append("text")
+      .attr("transform", "translate("+ (-235) +","+ ((height/2)+50) +") rotate(-90)")
+      .attr("x", margin.left)
+      .attr("y", (height/2))
+      .text("Yelp rating");
 
     let scatter = svg.append("g")
            .attr("transform","translate("+margin.left+","+margin.top+")");
@@ -202,6 +202,8 @@
 
     let points = scatter.selectAll('circle').data(pointsData)
 
+    console.log(pointsData);
+
     points.enter().append("circle")
         .attr("cx", d => ageScale(d.age))
         .attr("cy", d => ratingScale(d.rating))
@@ -212,6 +214,7 @@
         .attr("city", d => d.city + ", " + d.state)
         .attr("id", d => "C" + d.zip + d.key)
         .attr("restaurantType", d => d.key)
+        // .attr("age", d => Math.round(d.age))
         .on("mouseover", d => {
           scatter.append("text")
             .attr("id", "A" + d.zip + d.key)
@@ -234,9 +237,7 @@
             let circle = d3.select(this);
             circle.attr("opacity", 0.8).attr("r", 4);
           })
-        })
-
-
+        });
 
     let isCatDisplayeds = {}
     arrayOfRestaurantTypes.forEach((title) => {
@@ -279,20 +280,20 @@
           .style("color", colorScale(d))
           .attr("class", "selected")
           /*.on("mouseover", function() {
-            let totalRatingYoung = 0;
-            let numYoung = 0;
-            let totalRatingOld = 0;
-            let numOld = 0;
+            let totalRatingLeft = 0;
+            let numLeft = 0;
+            let totalRatingRight = 0;
+            let numRight = 0;
             scatter.selectAll("circle").each(function() {
               let circle = d3.select(this);
               if (circle.attr("restaurantType") === d.split(' ')[0]) {
                 circle.attr("opacity", 0.8);
                 if (ageInvScale(circle.attr("cx")) < ageCompValue) {
-                  totalRatingYoung = totalRatingYoung + ratingInvScale(circle.attr("cy"));
-                  numYoung = numYoung + 1;
+                  totalRatingLeft = totalRatingLeft + ratingInvScale(circle.attr("cy"));
+                  numLeft = numLeft + 1;
                 } else {
-                  totalRatingOld = totalRatingOld + ratingInvScale(circle.attr("cy"));
-                  numOld = numOld + 1;
+                  totalRatingRight = totalRatingRight + ratingInvScale(circle.attr("cy"));
+                  numRight = numRight + 1;
                 }
               }
               else {
@@ -301,11 +302,11 @@
             })
 
             //I don't want NaN to be displayed, so rather than dividing by 0, I divide by 1
-            if (numYoung == 0) {
-              numYoung = 1;
+            if (numLeft == 0) {
+              numLeft = 1;
             }
-            if (numOld == 0) {
-              numOld = 1;
+            if (numRight == 0) {
+              numRight = 1;
             }
             d3.select("#ourAverages").html("")
               .append("p").text(d)
@@ -314,8 +315,8 @@
               .style("margin-left", "50px")
               .style("margin-bottom", "30px")
               .style("color", colorScale(d))
-              .append("p").text("Average Rating for Average Age younger than " + ageCompValue + ": " + Math.round(100*(totalRatingYoung/numYoung))/100)
-              .append("p").text("Average Rating for Average Age older than " + ageCompValue + ": " + Math.round(100*(totalRatingOld/numOld))/100);
+              .append("p").text("Average Rating for Average Age younger than " + ageCompValue + ": " + Math.round(100*(totalRatingLeft/numLeft))/100)
+              .append("p").text("Average Rating for Average Age older than " + ageCompValue + ": " + Math.round(100*(totalRatingRight/numRight))/100);
           })
           .on("mouseout", function() {
             scatter.selectAll("circle").each(function() {
@@ -329,6 +330,107 @@
             changeCats([d], !isCatDisplayeds[d])
           })
         });
+
+    console.log(isCatDisplayeds);
+
+    let ageCompValue = 40;
+
+    // let ageCompValue = Math.round((ageMin + ageMax)/2);
+    // let ageCompValue = 40;
+    var slidersDiv = d3.select("#divForSlider").append("div");
+    slidersDiv.append("div").text("Age to Compare Against")
+        .append("div").append("input")
+        .attr("type", "range")
+        .style("width","750px")
+        .attr("min", Math.round(ageMin))
+        .attr("max", Math.round(ageMax))
+        .attr("step", 1)
+        .attr("value",ageCompValue)
+        .on("input", function () {
+          ageCompValue = Number(this.value);
+          // console.log(ageCompValue);
+          // svg.remove("line");
+          d3.select("#myLine")
+           .attr("x1", ageScale(ageCompValue) + margin.left + "px")
+           .attr("y1", "10px")
+           .attr("x2", ageScale(ageCompValue) + + margin.left + "px")
+           .attr("y2", "455px")
+           .style("stroke", "#d32323")
+           .style("stroke-width", "3px");
+          //Call showCircles with the hue value selected on the slider
+          // showCircles(Number(this.value));
+          updateBarChart(ageCompValue);
+        });
+
+    function updateBarChart(ageCompValue) {
+      d3.selectAll('.bar').remove();
+      validRes = [];
+      arrayOfRestaurantTypes.forEach(d => {
+        if (isCatDisplayeds[d])
+          validRes.push(d);
+      });
+      let totalRatingLeft = 0;
+      let numLeft = 0;
+      let totalRatingRight = 0;
+      let numRight = 0;
+      scatter.selectAll("circle").each(function() {
+        let circle = d3.select(this);
+        if (validRes.includes(circle.attr("restaurantType"))) {
+          if (ageInvScale(circle.attr("cx")) < ageCompValue) {
+            totalRatingLeft = totalRatingLeft + ratingInvScale(circle.attr("cy"));
+            numLeft = numLeft + 1;
+          } else {
+            totalRatingRight = totalRatingRight + ratingInvScale(circle.attr("cy"));
+            numRight = numRight + 1;
+          }
+        }
+      });
+
+      //I don't want NaN to be displayed, so rather than dividing by 0, I divide by 1
+      if (numLeft == 0) {
+        numLeft = 1;
+      }
+      if (numRight == 0) {
+        numRight = 1;
+      }
+
+      console.log(totalRatingLeft);
+      console.log(numLeft);
+      console.log(totalRatingRight);
+      console.log(numRight);
+
+      svg2.append("line").attr("class", "bar")
+        .attr("x1", barScale('left average')+243)
+        .attr("x2", barScale('left average')+243)
+        .attr("y1", height-60)
+        .attr("y2", (height-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))
+        .style("stroke-width", 70)
+        .style("stroke", "#d32323");
+
+      svg2.append("text").attr("class", "bar")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .attr("x", barScale('left average')+243)
+        .attr("y", ((height-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))-10)
+        .text(totalRatingLeft/numLeft);
+
+      svg2.append("line").attr("class", "bar")
+        .attr("x1", barScale('right average')+243)
+        .attr("x2", barScale('right average')+243)
+        .attr("y1", height-60)
+        .attr("y2", (height-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))
+        .style("stroke-width", 70)
+        .style("stroke", "#fcd6d3");
+
+      svg2.append("text").attr("class", "bar")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "20px")
+        .attr("x", barScale('right average')+243)
+        .attr("y", ((height-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))-10)
+        .text(totalRatingRight/numRight);
+    }
+
+    updateBarChart(ageCompValue);
   }
   requestData();
 
