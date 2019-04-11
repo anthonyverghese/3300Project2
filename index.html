@@ -213,14 +213,31 @@
         .attr("id", d => "C" + d.zip + d.key)
         .attr("restaurantType", d => d.key)
         .on("mouseover", d => {
-          scatter.append("text")
-            .attr("id", "A" + d.zip + d.key)
-            .attr("x", ageScale(d.age) - 80)
-            .attr("y", ratingScale(d.rating) - 15)
-            .text("City: " + d.city + ", " + d.state)
+          let attrbox = scatter.append("g").attr("class", "info-box")
+          
+          attrbox.append("rect")
+            .attr("rx", 6)
+            .attr("ry", 6)
+            .attr("width", 170)
+            .attr("height", 50)
+            .attr("class", "info-box")
+            .attr("stroke", "black")
+            .attr("fill", "white")
+            .attr("x", ageScale(d.age) + (d.age > Number(ageMin) + Number((ageMax - ageMin) / 2) ? -180 : 10))
+            .attr("y", ratingScale(d.rating) + 10)
+
+          attrbox.append("text").text(d.zip)
+            .attr("x", ageScale(d.age) + 2 + (d.age > Number(ageMin) + Number((ageMax - ageMin) / 2) ? -180 : 10))
+            .attr("y", ratingScale(d.rating) + 26)
+          attrbox.append("text").text(d.cat)
+            .attr("x", ageScale(d.age) + 2 + (d.age > Number(ageMin) + Number((ageMax - ageMin) / 2) ? -180 : 10))
+            .attr("y", ratingScale(d.rating) + 41)
+          attrbox.append("text").text(d.city + ", " + d.state)
+            .attr("x", ageScale(d.age) + 2 + (d.age > Number(ageMin) + Number((ageMax - ageMin) / 2) ? -180 : 10))
+            .attr("y", ratingScale(d.rating) + 56)
           scatter.selectAll("circle").each(function() {
             let circleWithSameZip = d3.select(this);
-            if (circleWithSameZip.attr("city") === d.city + ", " + d.state) {
+            if (circleWithSameZip.attr("id") === "C" + d.zip + d.key) {
               circleWithSameZip.attr("opacity", 0.8).attr("r", 6);
             }
             else {
@@ -229,7 +246,7 @@
           })
         })
         .on("mouseout", d => {
-          d3.select("#A" + d.zip + d.key).remove();
+          d3.select(".info-box").remove();
           scatter.selectAll("circle").each(function() {
             let circle = d3.select(this);
             circle.attr("opacity", 0.8).attr("r", 4);
