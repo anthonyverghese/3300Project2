@@ -163,7 +163,7 @@
       .text("Averages");
 
     svg2.append("text")
-      .attr("transform", "translate("+ (-235) +","+ ((height2/2)+50) +") rotate(-90)")
+      .attr("transform", "translate("+ (-110) +","+ ((height2/2)+50) +") rotate(-90)")
       .attr("x", margin.left)
       .attr("y", (height2/2))
       .text("Yelp rating");
@@ -394,7 +394,7 @@
       validRes = [];
       arrayOfRestaurantTypes.forEach(d => {
         if (isCatDisplayeds[d])
-          validRes.push(d);
+          validRes.push(d.split(' ')[0]);
       });
       let totalRatingLeft = 0;
       let numLeft = 0;
@@ -430,7 +430,7 @@
         .attr("x1", barScale('left average')+145)
         .attr("x2", barScale('left average')+145)
         .attr("y1", height2-60)
-        .attr("y2", (height2-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))
+        .attr("y2", ratingScale2((totalRatingLeft/numLeft)))
         .style("stroke-width", 70)
         .style("stroke", "#d32323");
 
@@ -438,14 +438,14 @@
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("x", barScale('left average')+145)
-        .attr("y", ((height2-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))-10)
+        .attr("y", (ratingScale2((totalRatingLeft/numLeft)))-10)
         .text((totalRatingLeft/numLeft).toFixed(2));
 
       svg2.append("line").attr("class", "bar")
         .attr("x1", barScale('right average')+145)
         .attr("x2", barScale('right average')+145)
         .attr("y1", height2-60)
-        .attr("y2", (height2-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))
+        .attr("y2", ratingScale2((totalRatingRight/numRight)))
         .style("stroke-width", 70)
         .style("stroke", "#fcd6d3");
 
@@ -453,7 +453,7 @@
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("x", barScale('right average')+145)
-        .attr("y", ((height2-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))-10)
+        .attr("y", (ratingScale2((totalRatingRight/numRight)))-10)
         .text((totalRatingRight/numRight).toFixed(2));
     }
 
