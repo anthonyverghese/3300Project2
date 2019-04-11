@@ -10,6 +10,10 @@ body {
   padding: 0;
 }
 
+#ageBarChart {
+  float: left;
+}
+
 #header, #rightP, #leftP {
   background-color: #d32323;
   color: white;
@@ -71,7 +75,7 @@ h1 {
 }
 
 #ourLegend {
-  float: none;
+  float: left;
   padding-left: 10px;
   /* padding-bottom: 10px; */
   padding-top: 10px;

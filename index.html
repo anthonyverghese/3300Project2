@@ -23,7 +23,7 @@
 <br/>
 <br/>
 <div id="ourAverages" max-width = "800"></div>
-<svg id="ageBarChart" width="800" height="500">
+<svg id="ageBarChart" width="400" height="250">
 </svg>
 
 <script>
@@ -31,10 +31,14 @@
   let svg2 = d3.select("svg#ageBarChart");
   let width = svg.attr("width");
   let height = svg.attr("height");
+  let width2 = svg2.attr("width");
+  let height2 = svg2.attr("height");
   let margin = { top: 10, right: 10, bottom: 70, left: 60 };
   let chartWidth = width - margin.left - margin.right;
-  console.log(chartWidth);
+  // console.log(chartWidth);
   let chartHeight = height - margin.top - margin.bottom;
+  let chartHeight2 = height2 - margin.top - margin.bottom;
+  let chartWidth2 = width2 - margin.left - margin.right;
 
 
   //key is category we will show, value is Yelp categories that count for it
@@ -82,7 +86,7 @@
 
     const barScale = d3.scaleBand()
             .domain(["left average", "right average"])
-            .range([0,chartWidth]);
+            .range([0,chartWidth2]);
 
     const ageInvScale = d3.scaleLinear()
             .domain([0, chartWidth])
@@ -92,6 +96,10 @@
     const ratingScale = d3.scaleLinear()
             .domain([0, 5])
             .range([chartHeight, 0]);
+
+    const ratingScale2 = d3.scaleLinear()
+            .domain([0, 5])
+            .range([chartHeight2, 0]);
 
     const ratingInvScale = d3.scaleLinear()
             .domain([chartHeight, 0])
@@ -127,7 +135,7 @@
 // <line x1="5" y1="5" x2="40" y2="40" stroke="gray" stroke-width="5"  />
 
     // Y axis ticks for bar graph
-    let leftAxis2 = d3.axisLeft(ratingScale).ticks(5, d3.format(".1s"));
+    let leftAxis2 = d3.axisLeft(ratingScale2).ticks(5, d3.format(".1s"));
      svg2.append("g").attr("class", "ticks")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftAxis2);
@@ -135,7 +143,7 @@
      // X axis ticks
     let bottomAxis2 = d3.axisBottom(barScale);
     let element2 = svg2.append("g").attr("class", "ticks")
-       .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
+       .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight2 + 10) +")");
     bottomAxis2(element2);
 
     svg.append("text")
@@ -150,14 +158,14 @@
       .text("Average Yelp rating");
 
     svg2.append("text")
-      .attr("x", (width/2))
-      .attr("y", chartHeight + margin.bottom+5)
+      .attr("x", (width2/2))
+      .attr("y", chartHeight2 + margin.bottom+5)
       .text("Averages");
 
     svg2.append("text")
-      .attr("transform", "translate("+ (-235) +","+ ((height/2)+50) +") rotate(-90)")
+      .attr("transform", "translate("+ (-235) +","+ ((height2/2)+50) +") rotate(-90)")
       .attr("x", margin.left)
-      .attr("y", (height/2))
+      .attr("y", (height2/2))
       .text("Yelp rating");
 
     let scatter = svg.append("g")
@@ -202,7 +210,7 @@
 
     let points = scatter.selectAll('circle').data(pointsData)
 
-    console.log(pointsData);
+    // console.log(pointsData);
 
     points.enter().append("circle")
         .attr("cx", d => ageScale(d.age))
@@ -217,7 +225,7 @@
         // .attr("age", d => Math.round(d.age))
         .on("mouseover", d => {
           let attrbox = scatter.append("g").attr("class", "info-box")
-          
+
           attrbox.append("rect")
             .attr("rx", 6)
             .attr("ry", 6)
@@ -348,7 +356,7 @@
           })
         });
 
-    console.log(isCatDisplayeds);
+    // console.log(isCatDisplayeds);
 
     let ageCompValue = 40;
 
@@ -365,7 +373,9 @@
         .attr("value",ageCompValue)
         .on("input", function () {
           ageCompValue = Number(this.value);
-          // console.log(ageCompValue);
+          console.log(ageCompValue);
+          console.log(ageMax);
+          console.log(ageMin);
           // svg.remove("line");
           d3.select("#myLine")
            .attr("x1", ageScale(ageCompValue) + margin.left + "px")
@@ -411,40 +421,40 @@
         numRight = 1;
       }
 
-      console.log(totalRatingLeft);
-      console.log(numLeft);
-      console.log(totalRatingRight);
-      console.log(numRight);
+      // console.log(totalRatingLeft);
+      // console.log(numLeft);
+      // console.log(totalRatingRight);
+      // console.log(numRight);
 
       svg2.append("line").attr("class", "bar")
-        .attr("x1", barScale('left average')+243)
-        .attr("x2", barScale('left average')+243)
-        .attr("y1", height-60)
-        .attr("y2", (height-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))
+        .attr("x1", barScale('left average')+145)
+        .attr("x2", barScale('left average')+145)
+        .attr("y1", height2-60)
+        .attr("y2", (height2-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))
         .style("stroke-width", 70)
         .style("stroke", "#d32323");
 
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .attr("x", barScale('left average')+243)
-        .attr("y", ((height-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))-10)
-        .text(totalRatingLeft/numLeft);
+        .attr("x", barScale('left average')+145)
+        .attr("y", ((height2-60) - ratingScale(Math.round(100*(totalRatingLeft/numLeft))/100))-10)
+        .text((totalRatingLeft/numLeft).toFixed(2));
 
       svg2.append("line").attr("class", "bar")
-        .attr("x1", barScale('right average')+243)
-        .attr("x2", barScale('right average')+243)
-        .attr("y1", height-60)
-        .attr("y2", (height-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))
+        .attr("x1", barScale('right average')+145)
+        .attr("x2", barScale('right average')+145)
+        .attr("y1", height2-60)
+        .attr("y2", (height2-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))
         .style("stroke-width", 70)
         .style("stroke", "#fcd6d3");
 
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .attr("x", barScale('right average')+243)
-        .attr("y", ((height-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))-10)
-        .text(totalRatingRight/numRight);
+        .attr("x", barScale('right average')+145)
+        .attr("y", ((height2-60) - ratingScale(Math.round(100*(totalRatingRight/numRight))/100))-10)
+        .text((totalRatingRight/numRight).toFixed(2));
     }
 
     updateBarChart(ageCompValue);
