@@ -14,7 +14,7 @@
   <div id="rightP"><span>INFO 3300</span></div>
 </div>
 <svg width="800" height="500" id="ageYelpPlot">
-<line id="myLine" x1="395" y1="10" x2="395" y2="455" stroke="#d32323" stroke-width="3"  />
+<line id="myLine" x1="385" y1="10" x2="385" y2="455" stroke="#d32323" stroke-width="3"  />
 <foreignobject class="node" x="0" y="400" width="800" height="100">
 <div id="divForSlider" y="400px"></div>
 </foreignobject>
@@ -81,13 +81,13 @@
     const ageMin = d3.min(ageData, d => isValidZip(d.zip) ? d.age :  100);
     const ageMax = d3.max(ageData, d => isValidZip(d.zip) ? d.age : 0);
     const ageScale = d3.scaleLinear()
-            .domain([ageMin - 1, ageMax + 1])
+            .domain([ageMin, ageMax])
             .range([0, chartWidth]);
 
     //ageInvScale is used to get the age from a point on the larger graph
     const ageInvScale = d3.scaleLinear()
             .domain([0, chartWidth])
-            .range([ageMin - 1, ageMax + 1])
+            .range([ageMin, ageMax])
 
     //barScale is used for text on bottom axis of bar graph
     const barScale = d3.scaleBand()
@@ -162,10 +162,10 @@
       .attr("y", (height/2))
       .text("Average Yelp rating");
 
-    svg2.append("text")
-      .attr("x", (width2/2)-100)
-      .attr("y", chartHeight2 + margin.bottom+5)
-      .text("Averages on Either Side of Slider");
+    // svg2.append("text")
+    //   .attr("x", (width2/2)-100)
+    //   .attr("y", chartHeight2 + margin.bottom+5)
+    //   .text("Averages on Either Side of Slider");
 
     svg2.append("text")
       .attr("transform", "translate("+ (-110) +","+ ((height2/2)+50) +") rotate(-90)")
@@ -316,28 +316,29 @@
           })
         });
 
-    let ageCompValue = 40;
+    let ageCompValue = 40.0;
     var slidersDiv = d3.select("#divForSlider").append("div");
     slidersDiv.append("div").text("Age to Compare Against")
         .append("div").append("input")
         .attr("type", "range")
-        .style("width","750px")
-        .attr("min", Math.round(ageMin))
-        .attr("max", Math.round(ageMax))
-        .attr("step", 1)
+        .style("width",chartWidth + "px")
+        .attr("min", ageMin)
+        .attr("max", ageMax)
+        .attr("step", .2)
         .attr("value",ageCompValue)
         .on("input", function () {
           ageCompValue = Number(this.value);
           console.log(ageCompValue);
-          console.log(ageMax);
-          console.log(ageMin);
+          // console.log(ageMax);
+          // console.log(ageMin);
+
           d3.select("#myLine")
            .attr("x1", ageScale(ageCompValue) + margin.left + "px")
            .attr("y1", "10px")
            .attr("x2", ageScale(ageCompValue) + + margin.left + "px")
            .attr("y2", "455px")
            .style("stroke", "#d32323")
-           .style("stroke-width", "3px");
+           .style("stroke-width", "2px");
           //Call showCircles with the hue value selected on the slider
           // showCircles(Number(this.value));
           updateBarChart(ageCompValue);
@@ -345,6 +346,7 @@
 
     function updateBarChart(ageCompValue) {
       d3.selectAll('.bar').remove();
+      d3.selectAll('.textUnderBar').remove();
       validRes = [];
       arrayOfRestaurantTypes.forEach(d => {
         if (isCatDisplayeds[d])
@@ -360,7 +362,7 @@
           if (ageInvScale(circle.attr("cx")) < ageCompValue) {
             totalRatingLeft = totalRatingLeft + ratingInvScale(circle.attr("cy"));
             numLeft = numLeft + 1;
-          } else {
+          } else if (ageInvScale(circle.attr("cx")) > ageCompValue){
             totalRatingRight = totalRatingRight + ratingInvScale(circle.attr("cy"));
             numRight = numRight + 1;
           }
@@ -374,6 +376,11 @@
       if (numRight == 0) {
         numRight = 1;
       }
+
+      svg2.append("text").attr("class", "textUnderBar")
+        .attr("x", (width2/2)-100)
+        .attr("y", chartHeight2 + margin.bottom+5)
+        .text("Averages on Either side of Age=" + ageCompValue);
 
       //Making left bar
       svg2.append("line").attr("class", "bar")
