@@ -26,7 +26,8 @@
 <div id="ourAverages" max-width = "800"></div>
 <svg id="ageBarChart" width="300" height="250">
 </svg>
-<div class="attribution"><i>Restaraunt data from <a href="https://www.yelp.com/dataset">Yelp</a>, age data from the <a href="https://factfinder.census.gov/">United States Census Bureau</a></i></div>
+<div class="attribution">
+  <i>Restaraunt data from <a href="https://www.yelp.com/dataset">Yelp</a>, age data from the <a href="https://factfinder.census.gov/">United States Census Bureau</a></i></div>
 
 <script>
   let svg = d3.select("svg#ageYelpPlot");
@@ -43,6 +44,7 @@
 
   let margin2 = { top: 40, right: 10, bottom: 70, left: 60 };
 
+  //a zip code/cuisine pair must have more reviews than this to show
   let countCutoff = 7;
 
 
@@ -68,6 +70,8 @@
     const ageData = await d3.csv("pop_mod.csv");
     const yelpData = await d3.json("zip_code_averages.json");
 
+    //This checks there is data in both datasets for the zip code, and at least one cuisine type as enough restaraunts
+    //in the zip code to show
     const isValidZip = (zip) => {
       if (yelpData[zip] == null) return false;
       const cats = yelpData[zip]['cats'];
@@ -115,6 +119,7 @@
             .range([chartHeight2, 0]);
 
     //colorScale is used for the colors of the food categories
+    //colors taken from http://colorbrewer2.org/
     const colorScale = d3.scaleOrdinal()
       .domain(arrayOfRestaurantTypes)
       .range(['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','Brown']);
@@ -160,7 +165,7 @@
       .attr("x", (width/2))
       .attr("y", 15)
       .attr("text-anchor", "middle")
-      .text("Average Yelp Rating of Restaraunts with Same Cuisine and Zip Code");
+      .text("Average Yelp Rating of Restaraunts with Same Cuisine and Zip Code (in AZ and NV)");
 
     svg.append("text")
       .attr("x", (width/2))
@@ -184,8 +189,8 @@
     let scatter = svg.append("g")
            .attr("transform","translate("+margin.left+","+margin.top+")");
 
+    //filter and merge datasets to get data for points. pointsData will be used in data joins.
     let pointsData = [];
-
     ageData.forEach(function (d) {
       if (yelpData[d.zip] != null) {
         const cats = yelpData[d.zip]['cats'];
