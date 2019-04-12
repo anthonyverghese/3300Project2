@@ -403,7 +403,8 @@
       })
 
       scatter.selectAll('circle').data(pointsData).style("display", d => isCatDisplayeds[d.cat] ? "" : "none")
-      updateBarChart(d3.select("#divForSlider input").attr("value"))
+
+      updateBarChart(d3.select("#divForSlider input").property("value"))
     }
 
     //Show all button of legend
