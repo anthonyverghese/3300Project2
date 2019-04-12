@@ -42,6 +42,8 @@
 
   let margin2 = { top: 40, right: 10, bottom: 70, left: 60 };
 
+  let countCutoff = 7;
+
 
   //key is category we will show, value is Yelp categories that count for it
   let mapofRestaurantTypes = {
@@ -72,7 +74,7 @@
         const value = mapofRestaurantTypes[key];
         if (cats[value[0]] != null) {
           if (value.length > 1 && cats[value[1]] != null) {
-            if (cats[value[0]].count + cats[value[1]].count > 15) { return true; }
+            if (cats[value[0]].count + cats[value[1]].count > countCutoff) { return true; }
           } else if (cats[value[0]].count > 15) return true;
         } else if (value.length > 1 && cats[value[1]] != null && cats[value[1]].count > 15) return true;
       }
@@ -208,7 +210,7 @@
             count = cats[value[1]].count;
             score = cats[value[1]].star_total;
           }
-          if (score != undefined && count >= 5) {
+          if (score != undefined && count > countCutoff) {
             pointsData.push({
               age: d.age.toString(),
               rating: score / count,
@@ -277,6 +279,15 @@
           })
         });
 
+    let updateLine = (ageCompValue) => {
+      d3.select("#myLine")
+          .attr("x1", ageScale(ageCompValue) + margin.left + "px")
+          .attr("y1", margin.top)
+          .attr("x2", ageScale(ageCompValue) + margin.left + "px")
+          .attr("y2", "430px")
+          .style("stroke", "#d32323")
+          .style("stroke-width", "2px");
+    }
     let ageCompValue = 40.0;
     var slidersDiv = d3.select("#divForSlider").append("div");
     slidersDiv.append("div").text("Age to Compare Against")
@@ -289,18 +300,12 @@
         .attr("value", ageCompValue)
         .on("input", function () {
           ageCompValue = Number(this.value);
-
-          d3.select("#myLine")
-           .attr("x1", ageScale(ageCompValue) + margin.left + "px")
-           .attr("y1", margin.top)
-           .attr("x2", ageScale(ageCompValue) + + margin.left + "px")
-           .attr("y2", "430px")
-           .style("stroke", "#d32323")
-           .style("stroke-width", "2px");
+          updateLine(ageCompValue)
           //Call showCircles with the hue value selected on the slider
           // showCircles(Number(this.value));
           updateBarChart(ageCompValue);
         });
+    updateLine(ageCompValue)
 
     function updateBarChart(ageCompValue) {
       d3.selectAll('.bar').remove();
