@@ -77,75 +77,80 @@
       return false
     }
 
-    //ageScale is used for x axis
+    //ageScale is used for x axis of larger graph
     const ageMin = d3.min(ageData, d => isValidZip(d.zip) ? d.age :  100);
     const ageMax = d3.max(ageData, d => isValidZip(d.zip) ? d.age : 0);
     const ageScale = d3.scaleLinear()
             .domain([ageMin - 1, ageMax + 1])
             .range([0, chartWidth]);
 
-    const barScale = d3.scaleBand()
-            .domain(["left average", "right average"])
-            .range([0,chartWidth2]);
-
+    //ageInvScale is used to get the age from a point on the larger graph
     const ageInvScale = d3.scaleLinear()
             .domain([0, chartWidth])
             .range([ageMin - 1, ageMax + 1])
 
-    //rating scale is used for y axis
+    //barScale is used for text on bottom axis of bar graph
+    const barScale = d3.scaleBand()
+            .domain(["left average", "right average"])
+            .range([0,chartWidth2]);
+
+    //ratingScale is used for y axis of larger graph
     const ratingScale = d3.scaleLinear()
             .domain([0, 5])
             .range([chartHeight, 0]);
 
-    const ratingScale2 = d3.scaleLinear()
-            .domain([0, 5])
-            .range([chartHeight2, 0]);
-
+    //ratingInvScale is used to get the rating from a point on the larger graph
     const ratingInvScale = d3.scaleLinear()
             .domain([chartHeight, 0])
             .range([0,5])
 
+    //ratingScale2 is used for y axis of bar graph
+    const ratingScale2 = d3.scaleLinear()
+            .domain([0, 5])
+            .range([chartHeight2, 0]);
+
+    //colorScale is used for the colors of the food categories
     const colorScale = d3.scaleOrdinal()
       .domain(arrayOfRestaurantTypes)
       .range(['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a','Brown']);
 
-     // Y axis ticks
+     // Y axis ticks for the larger graph
      let leftAxis = d3.axisLeft(ratingScale).ticks(5, d3.format(".1s"));
-     svg.append("g").attr("class", "ticks")
+     svg.append("g")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftAxis);
 
-     // X axis ticks
+     // X axis ticks for the larger graph
      let bottomAxis = d3.axisBottom(ageScale).ticks(8, d3.format("0s"));
-     let element = svg.append("g").attr("class", "ticks")
+     let element = svg.append("g")
        .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
      bottomAxis(element);
 
-     // Y axis gridlines
+     // Y axis gridlines for the larger graph
      let leftGridlines = d3.axisLeft(ratingScale).tickSize(-chartWidth-10).tickFormat("");
      svg.append("g").attr("class", "gridlines")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftGridlines);
 
-     // X axis gridlines
+     // X axis gridlines for the larger graph
      let bottomGridlines = d3.axisBottom(ageScale).tickSize(-chartHeight-10).tickFormat("");
      element = svg.append("g").attr("class", "gridlines")
        .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight + 10) +")");
      bottomGridlines(element);
-// <line x1="5" y1="5" x2="40" y2="40" stroke="gray" stroke-width="5"  />
 
-    // Y axis ticks for bar graph
+    // Y axis ticks for the bar graph
     let leftAxis2 = d3.axisLeft(ratingScale2).ticks(5, d3.format(".1s"));
-     svg2.append("g").attr("class", "ticks")
+     svg2.append("g")
        .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
        .call(leftAxis2);
 
-     // X axis ticks
+     // X axis ticks for the bar graph
     let bottomAxis2 = d3.axisBottom(barScale);
-    let element2 = svg2.append("g").attr("class", "ticks")
+    let element2 = svg2.append("g")
        .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight2 + 10) +")");
     bottomAxis2(element2);
 
+    //Putting axis titles on both graphs
     svg.append("text")
       .attr("x", (width/2))
       .attr("y", chartHeight + margin.bottom+5)
@@ -158,9 +163,9 @@
       .text("Average Yelp rating");
 
     svg2.append("text")
-      .attr("x", (width2/2))
+      .attr("x", (width2/2)-100)
       .attr("y", chartHeight2 + margin.bottom+5)
-      .text("Averages");
+      .text("Averages on Either Side of Slider");
 
     svg2.append("text")
       .attr("transform", "translate("+ (-110) +","+ ((height2/2)+50) +") rotate(-90)")
@@ -210,8 +215,7 @@
 
     let points = scatter.selectAll('circle').data(pointsData)
 
-    // console.log(pointsData);
-
+    //Plotting the points on the larger graph
     points.enter().append("circle")
         .attr("cx", d => ageScale(d.age))
         .attr("cy", d => ratingScale(d.rating))
@@ -222,7 +226,6 @@
         .attr("city", d => d.city + ", " + d.state)
         .attr("id", d => "C" + d.zip + d.key)
         .attr("restaurantType", d => d.key)
-        // .attr("age", d => Math.round(d.age))
         .on("mouseover", d => {
           let attrbox = scatter.append("g").attr("class", "info-box")
 
@@ -277,6 +280,7 @@
       scatter.selectAll('circle').data(pointsData).style("display", d => isCatDisplayeds[d.cat] ? "" : "none")
     }
 
+    //Show all button of legend
     d3.select("#ourLegend")
         .append("button")
         .text("Show all")
@@ -285,6 +289,8 @@
           changeCats(arrayOfRestaurantTypes, true)
           d3.selectAll("#ourLegend button.deselected").attr("class", "selected")
         })
+
+    //Hide all button of legend
     d3.select("#ourLegend")
         .append("button")
         .text("Hide all")
@@ -294,7 +300,7 @@
           d3.selectAll("#ourLegend button.selected").attr("class", "deselected")
         })
 
-    //Legend for selecting data points based on category
+    //Food category buttons of legend for selecting data points based on category
     arrayOfRestaurantTypes.forEach(d => {
         let selectDiv = d3.select("#ourLegend")
           .append("div")
@@ -304,64 +310,13 @@
           .style("border-color", colorScale(d))
           .style("color", colorScale(d))
           .attr("class", "selected")
-          /*.on("mouseover", function() {
-            let totalRatingLeft = 0;
-            let numLeft = 0;
-            let totalRatingRight = 0;
-            let numRight = 0;
-            scatter.selectAll("circle").each(function() {
-              let circle = d3.select(this);
-              if (circle.attr("restaurantType") === d.split(' ')[0]) {
-                circle.attr("opacity", 0.8);
-                if (ageInvScale(circle.attr("cx")) < ageCompValue) {
-                  totalRatingLeft = totalRatingLeft + ratingInvScale(circle.attr("cy"));
-                  numLeft = numLeft + 1;
-                } else {
-                  totalRatingRight = totalRatingRight + ratingInvScale(circle.attr("cy"));
-                  numRight = numRight + 1;
-                }
-              }
-              else {
-                circle.attr("opacity", 0.1);
-              }
-            })
-
-            //I don't want NaN to be displayed, so rather than dividing by 0, I divide by 1
-            if (numLeft == 0) {
-              numLeft = 1;
-            }
-            if (numRight == 0) {
-              numRight = 1;
-            }
-            d3.select("#ourAverages").html("")
-              .append("p").text(d)
-              .style("font-size", "25px")
-              .style("padding", "30px")
-              .style("margin-left", "50px")
-              .style("margin-bottom", "30px")
-              .style("color", colorScale(d))
-              .append("p").text("Average Rating for Average Age younger than " + ageCompValue + ": " + Math.round(100*(totalRatingLeft/numLeft))/100)
-              .append("p").text("Average Rating for Average Age older than " + ageCompValue + ": " + Math.round(100*(totalRatingRight/numRight))/100);
-          })
-          .on("mouseout", function() {
-            scatter.selectAll("circle").each(function() {
-              let circle = d3.select(this);
-              circle.attr("opacity", 0.8);
-            })
-            d3.select("#ourAverages").html("");
-          })*/
           .on("click", function() {
             d3.select(this).attr("class", isCatDisplayeds[d] ? "deselected" : "selected")
             changeCats([d], !isCatDisplayeds[d])
           })
         });
 
-    // console.log(isCatDisplayeds);
-
     let ageCompValue = 40;
-
-    // let ageCompValue = Math.round((ageMin + ageMax)/2);
-    // let ageCompValue = 40;
     var slidersDiv = d3.select("#divForSlider").append("div");
     slidersDiv.append("div").text("Age to Compare Against")
         .append("div").append("input")
@@ -376,7 +331,6 @@
           console.log(ageCompValue);
           console.log(ageMax);
           console.log(ageMin);
-          // svg.remove("line");
           d3.select("#myLine")
            .attr("x1", ageScale(ageCompValue) + margin.left + "px")
            .attr("y1", "10px")
@@ -421,39 +375,38 @@
         numRight = 1;
       }
 
-      // console.log(totalRatingLeft);
-      // console.log(numLeft);
-      // console.log(totalRatingRight);
-      // console.log(numRight);
-
+      //Making left bar
       svg2.append("line").attr("class", "bar")
         .attr("x1", barScale('left average')+145)
         .attr("x2", barScale('left average')+145)
         .attr("y1", height2-60)
-        .attr("y2", ratingScale2((totalRatingLeft/numLeft)))
+        .attr("y2", ratingScale2((totalRatingLeft/numLeft)) + 10)
         .style("stroke-width", 70)
         .style("stroke", "#d32323");
 
+      //Text above left bar
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("x", barScale('left average')+145)
-        .attr("y", (ratingScale2((totalRatingLeft/numLeft)))-10)
+        .attr("y", (ratingScale2((totalRatingLeft/numLeft))))
         .text((totalRatingLeft/numLeft).toFixed(2));
 
+      //Making right bar
       svg2.append("line").attr("class", "bar")
         .attr("x1", barScale('right average')+145)
         .attr("x2", barScale('right average')+145)
         .attr("y1", height2-60)
-        .attr("y2", ratingScale2((totalRatingRight/numRight)))
+        .attr("y2", ratingScale2((totalRatingRight/numRight)) + 10)
         .style("stroke-width", 70)
         .style("stroke", "#fcd6d3");
 
+      //Text above right bar
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
         .attr("x", barScale('right average')+145)
-        .attr("y", (ratingScale2((totalRatingRight/numRight)))-10)
+        .attr("y", (ratingScale2((totalRatingRight/numRight))))
         .text((totalRatingRight/numRight).toFixed(2));
     }
 
