@@ -2,6 +2,7 @@ body {
   padding-left: 10px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif ;
   font-family: 'Aldrich', sans-serif;
+  /*Other fonts for future use*/
   /* font-family: 'Racing Sans One', cursive; */
   /* font-family: 'Gugi', cursive; */
   /* font-family: 'Audiowide', cursive; */
@@ -65,10 +66,6 @@ h1 {
   margin-bottom: 20px;
 }
 
-/* #ageBarChart {
-  padding-left: 10px;
-} */
-
 #ourAverages {
   float: none;
   margin-top: 80px;
@@ -77,7 +74,6 @@ h1 {
 #ourLegend {
   float: left;
   padding-left: 10px;
-  /* padding-bottom: 10px; */
   padding-top: 10px;
 }
 
@@ -115,31 +111,18 @@ h1 {
 }
 
 #divForSlider {
-  /* float: left; */
   position: absolute;
   left: 51px;
   color: #d32323;
-  /* background-color: #fcd6d3; */
-  /* padding-top: 10px; */
-  /* padding-left: 10px; */
-  /* padding-bottom: 10px; */
 }
 
 #divForSlider input {
     cursor: pointer;
 }
 
-/* .gridlines line {
-  stroke: black;
-} */
-
 .gridlines .domain {
   stroke : none;
 }
-
-/* .ticks text {
-  fill : white
-} */
 
 /* Styling Citation: https://www.cssportal.com/style-input-range/ */
 input {
@@ -147,7 +130,6 @@ input {
   height: 25px;
   width: 100%;
   margin: 10px 0px;
-  /* background: #fcd6d3; */
 }
 
 input:focus {
