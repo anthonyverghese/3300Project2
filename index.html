@@ -39,6 +39,8 @@
   let chartHeight2 = height2 - margin.top - margin.bottom;
   let chartWidth2 = width2 - margin.left - margin.right;
 
+  let margin2 = { top: 40, right: 10, bottom: 70, left: 60 };
+
 
   //key is category we will show, value is Yelp categories that count for it
   let mapofRestaurantTypes = {
@@ -90,7 +92,7 @@
 
     //barScale is used for text on bottom axis of bar graph
     const barScale = d3.scaleBand()
-            .domain(["left average", "right average"])
+            .domain(["Average below 40", "Average above 40"])
             .range([0,chartWidth2]);
 
     //ratingScale is used for y axis of larger graph
@@ -140,14 +142,14 @@
     // Y axis ticks for the bar graph
     let leftAxis2 = d3.axisLeft(ratingScale2).ticks(5, d3.format(".1s"));
      svg2.append("g")
-       .attr("transform","translate("+ (margin.left-10) +","+ margin.top +")")
+       .attr("transform","translate("+ (margin2.left-10) +","+ margin2.top +")")
        .call(leftAxis2);
 
      // X axis ticks for the bar graph
     let bottomAxis2 = d3.axisBottom(barScale);
-    let element2 = svg2.append("g")
-       .attr("transform","translate("+ margin.left +","+ (margin.top + chartHeight2 + 10) +")");
-    bottomAxis2(element2);
+    let element2 = svg2.append("g").attr("id", "small-x")
+       .attr("transform","translate("+ margin2.left +","+ (margin2.top + chartHeight2 + 10) +")")
+       .call(bottomAxis2);
 
     //Putting axis titles on both graphs
     svg.append("text")
@@ -175,8 +177,9 @@
 
     svg2.append("text")
       .attr("transform", "translate("+ (-110) +","+ ((height2/2)+50) +") rotate(-90)")
-      .attr("x", margin.left)
+      .attr("x", margin2.left)
       .attr("y", (height2/2))
+      .attr("text-anchor", "middle")
       .text("Yelp rating");
 
     let scatter = svg.append("g")
@@ -380,17 +383,27 @@
         numRight = 1;
       }
 
-      svg2.append("text").attr("class", "textUnderBar")
-        .attr("x", (width2/2)-100)
-        .attr("y", chartHeight2 + margin.bottom+5)
-        .text("Left/Right of Slider Age=" + ageCompValue);
+      //dynamically updating axis based on https://bl.ocks.org/HarryStevens/678935d06d4601c25cb141bacd4068ce
+      barScale.domain(["Average below " + ageCompValue, "Average above " + ageCompValue])
+
+      svg2.append("text")
+        .attr("x", (width2/2))
+        .attr("y", margin2.top - 24)
+        .attr("text-anchor", "middle")
+        .text("Average Rating to");
+
+      svg2.append("text")
+        .attr("x", (width2/2))
+        .attr("y", margin2.top - 7)
+        .attr("text-anchor", "middle")
+        .text("Right and Left of Slider");
 
       //Making left bar
       svg2.append("line").attr("class", "bar")
-        .attr("x1", barScale('left average')+120)
-        .attr("x2", barScale('left average')+120)
-        .attr("y1", height2-60)
-        .attr("y2", ratingScale2((totalRatingLeft/numLeft)) + 10)
+        .attr("x1", barScale("Average below " + ageCompValue)+120)
+        .attr("x2", barScale("Average below " + ageCompValue)+120)
+        .attr("y1", margin2.top + chartHeight2 + 10)
+        .attr("y2", ratingScale2((totalRatingLeft/numLeft)) + margin2.top)
         .style("stroke-width", 70)
         .style("stroke", "#d32323");
 
@@ -398,16 +411,16 @@
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .attr("x", barScale('left average')+120)
-        .attr("y", (ratingScale2((totalRatingLeft/numLeft))))
+        .attr("x", barScale("Average below " + ageCompValue)+120)
+        .attr("y", (ratingScale2((totalRatingLeft/numLeft))) + margin2.top - 5)
         .text((totalRatingLeft/numLeft).toFixed(2));
 
       //Making right bar
       svg2.append("line").attr("class", "bar")
-        .attr("x1", barScale('right average')+120)
-        .attr("x2", barScale('right average')+120)
-        .attr("y1", height2-60)
-        .attr("y2", ratingScale2((totalRatingRight/numRight)) + 10)
+        .attr("x1", barScale("Average above " + ageCompValue)+120)
+        .attr("x2", barScale("Average above " + ageCompValue)+120)
+        .attr("y1", margin2.top + chartHeight2 + 10)
+        .attr("y2", ratingScale2((totalRatingRight/numRight)) + margin2.top)
         .style("stroke-width", 70)
         .style("stroke", "#fcd6d3");
 
@@ -415,9 +428,11 @@
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .attr("x", barScale('right average')+120)
-        .attr("y", (ratingScale2((totalRatingRight/numRight))))
+        .attr("x", barScale("Average above " + ageCompValue)+120)
+        .attr("y", (ratingScale2((totalRatingRight/numRight))) + margin2.top - 5)
         .text((totalRatingRight/numRight).toFixed(2));
+
+      d3.select('#small-x').transition().call(bottomAxis2)
     }
 
     updateBarChart(ageCompValue);
