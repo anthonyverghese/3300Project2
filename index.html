@@ -14,7 +14,7 @@
   <div id="rightP"><span>INFO 3300</span></div>
 </div>
 <svg width="800" height="500" id="ageYelpPlot">
-<line id="myLine" x1="385" y1="10" x2="385" y2="430" stroke="#d32323" stroke-width="3"  />
+<line id="myLine" x1="385" y1="30" x2="385" y2="430" stroke="#d32323" stroke-width="3"  />
 <foreignobject class="node" x="0" y="400" width="800" height="100">
 <div id="divForSlider" y="400px"></div>
 </foreignobject>
@@ -33,7 +33,7 @@
   let height = svg.attr("height");
   let width2 = svg2.attr("width");
   let height2 = svg2.attr("height");
-  let margin = { top: 10, right: 10, bottom: 70, left: 60 };
+  let margin = { top: 30, right: 10, bottom: 70, left: 60 };
   let chartWidth = width - margin.left - margin.right;
   let chartHeight = height - margin.top - margin.bottom;
   let chartHeight2 = height2 - margin.top - margin.bottom;
@@ -152,7 +152,14 @@
     //Putting axis titles on both graphs
     svg.append("text")
       .attr("x", (width/2))
+      .attr("y", 15)
+      .attr("text-anchor", "middle")
+      .text("Average Yelp Rating of Restaraunts with Same Cuisine and Zip Code");
+
+    svg.append("text")
+      .attr("x", (width/2))
       .attr("y", chartHeight + margin.bottom+5)
+      .attr("text-anchor", "middle")
       .text("Average resident age");
 
     svg.append("text")
@@ -320,17 +327,17 @@
     slidersDiv.append("div").text("Age to Compare Against")
         .append("div").append("input")
         .attr("type", "range")
-        .style("width",chartWidth + "px")
+        .style("width", (chartWidth + 18) + "px")
         .attr("min", ageMin)
         .attr("max", ageMax)
-        .attr("step", .2)
+        .attr("step", .05)
         .attr("value",ageCompValue)
         .on("input", function () {
           ageCompValue = Number(this.value);
 
           d3.select("#myLine")
            .attr("x1", ageScale(ageCompValue) + margin.left + "px")
-           .attr("y1", "10px")
+           .attr("y1", margin.top)
            .attr("x2", ageScale(ageCompValue) + + margin.left + "px")
            .attr("y2", "430px")
            .style("stroke", "#d32323")
