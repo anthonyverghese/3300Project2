@@ -23,7 +23,7 @@
 <br/>
 <br/>
 <div id="ourAverages" max-width = "800"></div>
-<svg id="ageBarChart" width="400" height="250">
+<svg id="ageBarChart" width="300" height="250">
 </svg>
 
 <script>
@@ -35,7 +35,6 @@
   let height2 = svg2.attr("height");
   let margin = { top: 10, right: 10, bottom: 70, left: 60 };
   let chartWidth = width - margin.left - margin.right;
-  // console.log(chartWidth);
   let chartHeight = height - margin.top - margin.bottom;
   let chartHeight2 = height2 - margin.top - margin.bottom;
   let chartWidth2 = width2 - margin.left - margin.right;
@@ -328,9 +327,6 @@
         .attr("value",ageCompValue)
         .on("input", function () {
           ageCompValue = Number(this.value);
-          console.log(ageCompValue);
-          // console.log(ageMax);
-          // console.log(ageMin);
 
           d3.select("#myLine")
            .attr("x1", ageScale(ageCompValue) + margin.left + "px")
