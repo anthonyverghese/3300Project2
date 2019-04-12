@@ -380,8 +380,8 @@
 
       //Making left bar
       svg2.append("line").attr("class", "bar")
-        .attr("x1", barScale('left average')+145)
-        .attr("x2", barScale('left average')+145)
+        .attr("x1", barScale('left average')+120)
+        .attr("x2", barScale('left average')+120)
         .attr("y1", height2-60)
         .attr("y2", ratingScale2((totalRatingLeft/numLeft)) + 10)
         .style("stroke-width", 70)
@@ -391,14 +391,14 @@
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .attr("x", barScale('left average')+145)
+        .attr("x", barScale('left average')+120)
         .attr("y", (ratingScale2((totalRatingLeft/numLeft))))
         .text((totalRatingLeft/numLeft).toFixed(2));
 
       //Making right bar
       svg2.append("line").attr("class", "bar")
-        .attr("x1", barScale('right average')+145)
-        .attr("x2", barScale('right average')+145)
+        .attr("x1", barScale('right average')+120)
+        .attr("x2", barScale('right average')+120)
         .attr("y1", height2-60)
         .attr("y2", ratingScale2((totalRatingRight/numRight)) + 10)
         .style("stroke-width", 70)
@@ -408,7 +408,7 @@
       svg2.append("text").attr("class", "bar")
         .attr("text-anchor", "middle")
         .attr("font-size", "20px")
-        .attr("x", barScale('right average')+145)
+        .attr("x", barScale('right average')+120)
         .attr("y", (ratingScale2((totalRatingRight/numRight))))
         .text((totalRatingRight/numRight).toFixed(2));
     }
