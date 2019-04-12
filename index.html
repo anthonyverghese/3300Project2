@@ -277,55 +277,6 @@
           })
         });
 
-    let isCatDisplayeds = {}
-    arrayOfRestaurantTypes.forEach((title) => {
-      isCatDisplayeds[title] = true
-    })
-
-    const changeCats = (cats, isAdding) => {
-      cats.forEach((cat) => {
-        isCatDisplayeds[cat] = isAdding
-      })
-
-      scatter.selectAll('circle').data(pointsData).style("display", d => isCatDisplayeds[d.cat] ? "" : "none")
-    }
-
-    //Show all button of legend
-    d3.select("#ourLegend")
-        .append("button")
-        .text("Show all")
-        .attr("class", "allbutton")
-        .on("click", (d, i, nodes) => {
-          changeCats(arrayOfRestaurantTypes, true)
-          d3.selectAll("#ourLegend button.deselected").attr("class", "selected")
-        })
-
-    //Hide all button of legend
-    d3.select("#ourLegend")
-        .append("button")
-        .text("Hide all")
-        .attr("class", "allbutton")
-        .on("click", (d, i, nodes) => {
-          changeCats(arrayOfRestaurantTypes, false)
-          d3.selectAll("#ourLegend button.selected").attr("class", "deselected")
-        })
-
-    //Food category buttons of legend for selecting data points based on category
-    arrayOfRestaurantTypes.forEach(d => {
-        let selectDiv = d3.select("#ourLegend")
-          .append("div")
-          .attr("id", d.split(' ')[0] + "-select-div")
-
-        selectDiv.append("button").text(d)
-          .style("border-color", colorScale(d))
-          .style("color", colorScale(d))
-          .attr("class", "selected")
-          .on("click", function() {
-            d3.select(this).attr("class", isCatDisplayeds[d] ? "deselected" : "selected")
-            changeCats([d], !isCatDisplayeds[d])
-          })
-        });
-
     let ageCompValue = 40.0;
     var slidersDiv = d3.select("#divForSlider").append("div");
     slidersDiv.append("div").text("Age to Compare Against")
@@ -435,6 +386,56 @@
 
       d3.select('#small-x').transition().call(bottomAxis2)
     }
+
+    let isCatDisplayeds = {}
+    arrayOfRestaurantTypes.forEach((title) => {
+      isCatDisplayeds[title] = true
+    })
+
+    const changeCats = (cats, isAdding) => {
+      cats.forEach((cat) => {
+        isCatDisplayeds[cat] = isAdding
+      })
+
+      scatter.selectAll('circle').data(pointsData).style("display", d => isCatDisplayeds[d.cat] ? "" : "none")
+      updateBarChart(d3.select("#divForSlider input").attr("value"))
+    }
+
+    //Show all button of legend
+    d3.select("#ourLegend")
+        .append("button")
+        .text("Show all")
+        .attr("class", "allbutton")
+        .on("click", (d, i, nodes) => {
+          changeCats(arrayOfRestaurantTypes, true)
+          d3.selectAll("#ourLegend button.deselected").attr("class", "selected")
+        })
+
+    //Hide all button of legend
+    d3.select("#ourLegend")
+        .append("button")
+        .text("Hide all")
+        .attr("class", "allbutton")
+        .on("click", (d, i, nodes) => {
+          changeCats(arrayOfRestaurantTypes, false)
+          d3.selectAll("#ourLegend button.selected").attr("class", "deselected")
+        })
+
+    //Food category buttons of legend for selecting data points based on category
+    arrayOfRestaurantTypes.forEach(d => {
+        let selectDiv = d3.select("#ourLegend")
+          .append("div")
+          .attr("id", d.split(' ')[0] + "-select-div")
+
+        selectDiv.append("button").text(d)
+          .style("border-color", colorScale(d))
+          .style("color", colorScale(d))
+          .attr("class", "selected")
+          .on("click", function() {
+            d3.select(this).attr("class", isCatDisplayeds[d] ? "deselected" : "selected")
+            changeCats([d], !isCatDisplayeds[d])
+          })
+        });
 
     updateBarChart(ageCompValue);
   }
