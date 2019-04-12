@@ -87,6 +87,7 @@ h1 {
   margin-top: 7px;
   font-weight: bold;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 #ourLegend button.allbutton {
@@ -126,6 +127,10 @@ h1 {
   /* padding-top: 10px; */
   /* padding-left: 10px; */
   /* padding-bottom: 10px; */
+}
+
+#divForSlider input {
+    cursor: pointer;
 }
 
 /* .gridlines line {
