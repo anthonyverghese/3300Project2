@@ -174,11 +174,6 @@
       .attr("y", (height/2))
       .text("Average Yelp rating");
 
-    // svg2.append("text")
-    //   .attr("x", (width2/2)-100)
-    //   .attr("y", chartHeight2 + margin.bottom+5)
-    //   .text("Averages on Either Side of Slider");
-
     svg2.append("text")
       .attr("transform", "translate("+ (-110) +","+ ((height2/2)+50) +") rotate(-90)")
       .attr("x", margin2.left)
@@ -302,8 +297,6 @@
         .on("input", function () {
           ageCompValue = Number(this.value);
           updateLine(ageCompValue)
-          //Call showCircles with the hue value selected on the slider
-          // showCircles(Number(this.value));
           updateBarChart(ageCompValue);
         });
     updateLine(ageCompValue)
