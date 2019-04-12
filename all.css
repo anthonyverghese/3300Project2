@@ -224,3 +224,9 @@ input:focus::-ms-fill-lower {
 input:focus::-ms-fill-upper {
   background: #d32323;
 }
+
+.attribution {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
